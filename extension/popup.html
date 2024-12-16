@@ -1,28 +1,196 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<script src="openlist-lib.js"></script>
-	<script src="openlist-popup.js"></script>
-	<style type="text/css">
-		body {
-			font-family: sans-serif;
-			margin: 0;
-			padding: 10px;
-		}
-		#list {
-			font-family: monospace;
-			width: 400px;
-			height: 200px;
-		}
-		#openButton {
-			float: right;
-			margin-top: 8px;
-			margin-bottom: 8px;
-			padding: 5px 15px 7px 15px;
-		}
-	</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenList</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 12px;
+            width: 450px;
+            color: #333;
+        }
+
+        #list {
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            width: 100%;
+            height: 200px;
+            margin-bottom: 12px;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+            line-height: 1.4;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        #openButton {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        #openButton:hover {
+            background-color: #1557b0;
+        }
+
+        #openButton:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #status {
+            color: #5f6368;
+            font-size: 13px;
+            margin-right: 8px;
+            min-height: 20px;
+        }
+
+        .error {
+            color: #d93025;
+        }
+
+        .error-container {
+            background-color: #fce8e6;
+            border: 1px solid #d93025;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin-top: 8px;
+        }
+
+        .error-message {
+            color: #d93025;
+            margin: 0 0 4px 0;
+            font-weight: 500;
+        }
+
+        .error-details {
+            margin: 4px 0 0 0;
+            padding-left: 20px;
+            font-size: 12px;
+            color: #555;
+        }
+
+        .error-details li {
+            margin: 2px 0;
+        }
+
+        #metrics {
+            border-top: 1px solid #eee;
+            margin-top: 12px;
+            padding-top: 12px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .metric {
+            display: flex;
+            flex-direction: column;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .metric-label {
+            color: #5f6368;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-weight: 500;
+            color: #1a73e8;
+        }
+
+        .metrics-error {
+            color: #d93025;
+            font-size: 12px;
+            text-align: center;
+            padding: 8px;
+            background-color: #fce8e6;
+            border-radius: 4px;
+        }
+
+        /* Accessibility improvements */
+        #list:focus {
+            outline: 2px solid #1a73e8;
+            outline-offset: -1px;
+        }
+
+        #openButton:focus {
+            outline: 2px solid #1a73e8;
+            outline-offset: 2px;
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #202124;
+                color: #e8eaed;
+            }
+
+            #list {
+                background-color: #292a2d;
+                border-color: #5f6368;
+                color: #e8eaed;
+            }
+
+            #status {
+                color: #9aa0a6;
+            }
+
+            .metric {
+                background-color: #292a2d;
+            }
+
+            .metric-label {
+                color: #9aa0a6;
+            }
+
+            .metric-value {
+                color: #8ab4f8;
+            }
+
+            .error-container {
+                background-color: #402022;
+                border-color: #d93025;
+            }
+
+            .error-details {
+                color: #9aa0a6;
+            }
+        }
+    </style>
 </head>
-<body id="body">
-	<textarea id="list" autofocus="autofocus"></textarea>
-	<button id="openButton" title="Open this list of URLs in new tabs">Open</button>
+<body>
+    <textarea id="list" 
+              placeholder="Paste URLs here, one per line. Will also convert text to search queries."
+              spellcheck="false"
+              autofocus></textarea>
+    <div class="button-container">
+        <span id="status"></span>
+        <button id="openButton" title="Open these URLs in new tabs">Open URLs</button>
+    </div>
+    <div id="metrics" aria-live="polite"></div>
+    <script src="popup.js"></script>
 </body>
 </html>

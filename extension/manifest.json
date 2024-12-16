@@ -1,26 +1,39 @@
 {
-  "name": "OpenList",
-  "author": "Chris Dzombak <http://chris.dzombak.name>",
-  "manifest_version": 2,
-  "version": "0.3.4",
-  "description": "Utilities to create and open lists of tabs.",
-  "background": {
-    "page": "background.html",
-    "persistent": false
-  },
-  "homepage_url": "https://github.com/cdzombak/OpenList",
-  "permissions": [
-    "contextMenus",
-    "tabs"
-  ],
-  "browser_action": {
-    "default_icon":  "icon/icon-48.png",
-    "default_title": "Tab List",
-    "default_popup": "popup.html"
-  },
-  "icons": {
-    "16": "icon/icon-16.png",
-    "48": "icon/icon-48.png",
-    "128": "icon/icon-128.png"
-  }
+    "manifest_version": 3,
+    "name": "OpenList",
+    "version": "1.0.0",
+    "description": "Manage and open lists of URLs. Select URLs in any webpage or paste them to open in new tabs. Originally by Chris Dzombak, updated by TrustInsights.ai",
+    "permissions": [
+        "contextMenus",
+        "tabs",
+        "storage"
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "icon/icon-16.png",
+            "48": "icon/icon-48.png",
+            "128": "icon/icon-128.png"
+        }
+    },
+    "icons": {
+        "16": "icon/icon-16.png",
+        "48": "icon/icon-48.png",
+        "128": "icon/icon-128.png"
+    },
+    "background": {
+        "service_worker": "service-worker.js",
+        "type": "module"
+    },
+    "minimum_chrome_version": "102",
+    "content_security_policy": {
+        "extension_pages": "default-src 'self'; script-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests;"
+    },
+    "web_accessible_resources": [{
+        "resources": ["icon/*.png"],
+        "matches": ["<all_urls>"]
+    }],
+    "host_permissions": [
+        "*://*/*"
+    ]
 }
