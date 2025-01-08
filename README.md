@@ -15,7 +15,7 @@ OpenList helps you manage lists of URLs. It's useful if you have a habit of emai
 
 ## Installation
 
-[Download the extension from the Chrome store](https://chrome.google.com/webstore/detail/nkpjembldfckmdchbdiclhfedcngbgnl). It's free!
+[Download the extension from the Chrome store](https://chromewebstore.google.com/detail/openlist/lfbdgcgbddpkaogkhaieknhallmebhkm?authuser=0&hl=en). It's free!
 
 ## Usage
 
