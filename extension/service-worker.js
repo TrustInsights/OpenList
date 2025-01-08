@@ -188,7 +188,7 @@ async function openList(list) {
 
         metrics.urlsProcessed += strings.length;
         results.totalTime = performance.now() - startTime;
-        
+
         log('info', 'URL processing complete', { results });
         return results;
 
@@ -204,7 +204,7 @@ async function initializeContextMenu() {
     try {
         // First, remove any existing context menu items
         await chrome.contextMenus.removeAll();
-        
+
         // Create the context menu
         await chrome.contextMenus.create({
             id: CONFIG.CONTEXT_MENU_ID,
@@ -235,7 +235,7 @@ async function initializeContextMenu() {
 chrome.runtime.onInstalled.addListener(async (details) => {
     serviceWorkerState.installTime = Date.now();
     log('info', 'Extension installed/updated', { details });
-    
+
     try {
         await initializeContextMenu();
     } catch (error) {
@@ -247,7 +247,7 @@ chrome.runtime.onStartup.addListener(async () => {
     serviceWorkerState.activationTime = Date.now();
     serviceWorkerState.restarts++;
     log('info', 'Service worker started', { serviceWorkerState });
-    
+
     try {
         await initializeContextMenu();
     } catch (error) {
@@ -298,5 +298,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             }
         });
         return false;
+    }
+
+    if (request.action === 'getCurrentTabUrls') {
+        chrome.tabs.query({ currentWindow: true })
+            .then(tabs => {
+                const urls = tabs.map(tab => tab.url);
+                sendResponse(urls);
+            })
+            .catch(error => {
+                log('error', 'Error fetching current tab URLs', { error: error.message });
+                sendResponse([]); // Send an empty array in case of error
+            });
+        return true;
     }
 });

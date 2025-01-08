@@ -1,12 +1,11 @@
 {
     "manifest_version": 3,
     "name": "OpenList",
-    "version": "1.0.0",
-    "description": "Manage and open lists of URLs. Select URLs in any webpage or paste them to open in new tabs. Originally by Chris Dzombak, updated by TrustInsights.ai",
+    "version": "1.0.2",
+    "description": "Manage and open lists of URLs. Select URLs in any webpage or paste them to open in new tabs. Updated by TrustInsights.ai.",
     "permissions": [
         "contextMenus",
-        "tabs",
-        "storage"
+        "tabs"
     ],
     "action": {
         "default_popup": "popup.html",
@@ -27,12 +26,18 @@
     },
     "minimum_chrome_version": "102",
     "content_security_policy": {
-        "extension_pages": "default-src 'self'; script-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests;"
+        "extension_pages": "default-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests;"
     },
-    "web_accessible_resources": [{
-        "resources": ["icon/*.png"],
-        "matches": ["<all_urls>"]
-    }],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "icon/*.png"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ],
     "host_permissions": [
         "*://*/*"
     ]

@@ -26,7 +26,7 @@ function formatDuration(ms) {
     const seconds = Math.floor(ms / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
-    
+
     if (hours > 0) {
         return `${hours}h ${minutes % 60}m`;
     } else if (minutes > 0) {
@@ -39,7 +39,7 @@ function formatDuration(ms) {
 function showError(message, details = []) {
     const errorContainer = document.createElement('div');
     errorContainer.className = 'error-container';
-    
+
     const errorMessage = document.createElement('p');
     errorMessage.className = 'error-message';
     errorMessage.textContent = message;
@@ -48,7 +48,7 @@ function showError(message, details = []) {
     if (details && details.length > 0) {
         const errorDetails = document.createElement('ul');
         errorDetails.className = 'error-details';
-        
+
         details.slice(0, CONFIG.MAX_ERROR_DETAILS).forEach(detail => {
             const li = document.createElement('li');
             li.textContent = detail;
@@ -94,12 +94,12 @@ async function updateMetrics() {
 
         if (response.status === 'success' && metricsElement) {
             const { metrics } = response;
-            const successRate = metrics.urlsProcessed ? 
-                ((metrics.tabsOpened / metrics.urlsProcessed) * 100).toFixed(1) : 
+            const successRate = metrics.urlsProcessed ?
+                ((metrics.tabsOpened / metrics.urlsProcessed) * 100).toFixed(1) :
                 '100';
-            
+
             const uptime = formatDuration(metrics.uptime);
-            
+
             metricsElement.innerHTML = `
                 <div class="metrics-grid">
                     <div class="metric">
@@ -184,13 +184,14 @@ async function initPopup() {
         await updateMetrics();
         const metricsInterval = setInterval(updateMetrics, CONFIG.METRICS_REFRESH_INTERVAL);
 
-        // Get current tabs if URL includes focus hack parameter
-        if (location.search === '?focusHack') {
-            const urls = await getCurrentWindowTabs();
-            if (urls) {
-                listTextArea.value = urls;
-                listTextArea.select();
+        // Pre-populate with current tab URLs
+        try {
+            const tabs = await chrome.runtime.sendMessage({ action: 'getCurrentTabUrls' });
+            if (tabs && tabs.length > 0) {
+                listTextArea.value = tabs.join('\n');
             }
+        } catch (error) {
+            console.error('Error fetching current tabs for popup:', error);
         }
 
         // Add event listeners
