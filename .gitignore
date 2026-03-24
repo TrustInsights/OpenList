@@ -5,3 +5,11 @@ dist/
 .vite/
 *.tsbuildinfo
 coverage/
+.claude/
+data/
+docs/
+input/
+logs/
+output/
+temp/
+tests/
