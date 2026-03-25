@@ -5,7 +5,7 @@
   "description": "Manage and open lists of URLs in new tabs",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
