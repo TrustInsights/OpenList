@@ -1,6 +1,6 @@
 {
   "name": "openlist",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "private": true,
   "description": "Manage and open lists of URLs in new tabs",
   "scripts": {
