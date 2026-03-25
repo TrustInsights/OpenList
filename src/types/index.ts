@@ -1,5 +1,8 @@
 // Shared TypeScript types for OpenList Chrome Extension
 
+import type { ExtensionMetricsSchema, ServiceWorkerStateSchema } from '@/schemas/metrics';
+import type { z } from 'zod';
+
 /** Result of processing a URL list */
 export interface OpenListResult {
   successful: number;
@@ -9,27 +12,6 @@ export interface OpenListResult {
   errors: string[];
 }
 
-/** Extension metrics tracked across operations */
-export interface ExtensionMetrics {
-  tabsOpened: number;
-  tabsFailed: number;
-  urlsProcessed: number;
-  lastError: string | null;
-  startTime: number;
-  lastOperation: string | null;
-}
-
-/** Service worker lifecycle state */
-export interface ServiceWorkerState {
-  installTime: number | null;
-  activationTime: number | null;
-  restarts: number;
-  lastContextMenuCreation: number | null;
-}
-
-/** Combined metrics response from background */
-export interface MetricsResponse {
-  metrics: ExtensionMetrics;
-  serviceWorkerState: ServiceWorkerState;
-  uptime: number;
-}
+// Derive metric types from Zod schemas — single source of truth
+export type ExtensionMetrics = z.infer<typeof ExtensionMetricsSchema>;
+export type ServiceWorkerState = z.infer<typeof ServiceWorkerStateSchema>;

@@ -3,6 +3,9 @@
 import { initializeContextMenu } from '@/background/context-menu';
 import { handleMessage } from '@/background/messages';
 import { getSwState, setSwState } from '@/background/metrics';
+import { openList } from '@/background/open-list';
+import { CONFIG } from '@/schemas/config';
+import { toErrorMessage } from '@/utils/errors';
 import { logger } from '@/utils/logger';
 
 chrome.runtime.onInstalled.addListener(async () => {
@@ -14,25 +17,19 @@ chrome.runtime.onInstalled.addListener(async () => {
 
 chrome.runtime.onStartup.addListener(async () => {
   const state = await getSwState();
-  await setSwState({
-    ...state,
-    activationTime: Date.now(),
-    restarts: state.restarts + 1,
-  });
-  logger.info('Service worker started', { restarts: state.restarts + 1 });
+  const restarts = state.restarts + 1;
+  await setSwState({ ...state, activationTime: Date.now(), restarts });
+  logger.info('Service worker started', { restarts });
   await initializeContextMenu();
 });
 
 chrome.contextMenus.onClicked.addListener(async (info) => {
-  if (info.menuItemId === 'OpenList-ContextMenuOpen' && info.selectionText) {
+  if (info.menuItemId === CONFIG.CONTEXT_MENU_ID && info.selectionText) {
     try {
-      const { openList } = await import('@/background/open-list');
       const results = await openList(info.selectionText);
       logger.info('Context menu selection processed', { results });
     } catch (err) {
-      logger.error('Context menu click handler error', {
-        error: err instanceof Error ? err.message : String(err),
-      });
+      logger.error('Context menu click handler error', { error: toErrorMessage(err) });
     }
   }
 });

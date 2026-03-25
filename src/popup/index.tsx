@@ -1,5 +1,3 @@
-// Popup entry point
-
 import { App } from '@/popup/App';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';

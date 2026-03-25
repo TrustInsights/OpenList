@@ -3,6 +3,9 @@
 import { BLOCKED_PROTOCOLS } from '@/schemas/urls';
 import { logger } from '@/utils/logger';
 
+/** Protocols accepted as valid URL prefixes (non-exhaustive; bare domains are also accepted). */
+const ALLOWED_PROTOCOLS = ['https:', 'http:', 'ftp:', 'chrome:'] as const;
+
 /**
  * Determines whether a string is likely a URL.
  * @param input - The string to test
@@ -13,18 +16,9 @@ export function isProbablyUrl(input: unknown): boolean {
 
   const lower = input.trim().toLowerCase();
 
-  if (BLOCKED_PROTOCOLS.some((p) => lower.startsWith(p))) {
-    logger.warn('Blocked dangerous protocol', { url: input });
-    return false;
-  }
+  if (BLOCKED_PROTOCOLS.some((p) => lower.startsWith(p))) return false;
 
-  if (
-    lower.startsWith('https:') ||
-    lower.startsWith('http:') ||
-    lower.startsWith('ftp:') ||
-    lower.startsWith('chrome:') ||
-    lower.startsWith('www.')
-  ) {
+  if (ALLOWED_PROTOCOLS.some((p) => lower.startsWith(p)) || lower.startsWith('www.')) {
     return true;
   }
 

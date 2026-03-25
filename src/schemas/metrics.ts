@@ -29,7 +29,7 @@ export const DEFAULT_METRICS: z.infer<typeof ExtensionMetricsSchema> = {
   tabsFailed: 0,
   urlsProcessed: 0,
   lastError: null,
-  startTime: Date.now(),
+  startTime: 0,
   lastOperation: null,
 };
 

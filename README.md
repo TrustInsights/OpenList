@@ -85,12 +85,49 @@ Please open an issue on [the GitHub issue tracker for this project](https://gith
 
 ## Development
 
-To work on this extension:
+### Prerequisites
 
-1. Clone the repository
+- Node.js 18+
+- pnpm 9+
+
+### Setup
+
+```bash
+git clone https://github.com/cdzombak/OpenList.git
+cd OpenList
+pnpm install
+```
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start Vite dev server with CRXJS HMR |
+| `pnpm build` | Production build to `dist/` |
+| `pnpm test` | Unit tests with 100% coverage (Vitest) |
+| `pnpm test:watch` | Unit tests in watch mode |
+| `pnpm test:e2e` | End-to-end tests (Playwright, requires built `dist/`) |
+| `pnpm lint` | Biome lint check |
+| `pnpm lint:fix` | Biome lint with auto-fix |
+| `pnpm typecheck` | TypeScript type check |
+| `pnpm knip` | Dead code / unused exports check |
+| `pnpm check` | Full quality gate (lint + typecheck + test + knip) |
+
+### Loading in Chrome
+
+1. Run `pnpm build`
 2. Open Chrome and navigate to `chrome://extensions`
 3. Enable Developer Mode
-4. Click "Load unpacked" and select the `extension` directory
+4. Click "Load unpacked" and select the `dist/` directory
+
+### Tech Stack
+
+- **Vite 6** + **CRXJS** — Chrome extension build tooling with HMR
+- **React 19** + **TypeScript 5.8** — Popup UI
+- **Zod** — Runtime validation for messages and storage
+- **Biome** — Linting and formatting
+- **Vitest** + **Testing Library** — Unit tests with 100% coverage enforcement
+- **Playwright** — E2E integration tests
 
 ## Privacy
 

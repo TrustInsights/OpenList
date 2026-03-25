@@ -21,7 +21,14 @@ export const IncomingMessageSchema = z.discriminatedUnion('action', [
   GetCurrentTabUrlsMessageSchema,
 ]);
 
-export type OpenListMessage = z.infer<typeof OpenListMessageSchema>;
-export type GetMetricsMessage = z.infer<typeof GetMetricsMessageSchema>;
-export type GetCurrentTabUrlsMessage = z.infer<typeof GetCurrentTabUrlsMessageSchema>;
-export type IncomingMessage = z.infer<typeof IncomingMessageSchema>;
+/** Response schema for the openList background action. */
+export const OpenListResponseSchema = z.object({
+  status: z.literal('complete'),
+  results: z.object({
+    successful: z.number().int().min(0),
+    failed: z.number().int().min(0),
+    skipped: z.number().int().min(0),
+    totalTime: z.number().min(0),
+    errors: z.array(z.string()),
+  }),
+});

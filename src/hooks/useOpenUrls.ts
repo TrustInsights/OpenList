@@ -1,7 +1,6 @@
-// Hook for the URL-opening action
-
+import { OpenListResponseSchema } from '@/schemas/messages';
 import type { OpenListResult } from '@/types';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 interface OpenUrlsState {
   isLoading: boolean;
@@ -20,7 +19,7 @@ export function useOpenUrls(): OpenUrlsState & { openUrls: (text: string) => Pro
     error: null,
   });
 
-  async function openUrls(text: string): Promise<void> {
+  const openUrls = useCallback(async (text: string): Promise<void> => {
     if (!text.trim()) {
       setState({
         isLoading: false,
@@ -33,16 +32,21 @@ export function useOpenUrls(): OpenUrlsState & { openUrls: (text: string) => Pro
     setState({ isLoading: true, result: null, error: null });
 
     try {
-      const response = await chrome.runtime.sendMessage({ action: 'openList', urls: text });
+      const raw = await chrome.runtime.sendMessage({ action: 'openList', urls: text });
+      const parsed = OpenListResponseSchema.safeParse(raw);
 
-      if (response.status === 'error') throw new Error(response.message as string);
+      if (!parsed.success) {
+        const msg = (raw as { message?: string })?.message ?? 'Failed to open tabs';
+        setState({ isLoading: false, result: null, error: msg });
+        return;
+      }
 
-      setState({ isLoading: false, result: response.results as OpenListResult, error: null });
+      setState({ isLoading: false, result: parsed.data.results, error: null });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to open tabs';
       setState({ isLoading: false, result: null, error: message });
     }
-  }
+  }, []);
 
   return { ...state, openUrls };
 }

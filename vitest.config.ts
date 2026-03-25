@@ -14,6 +14,8 @@ export default defineConfig({
     globals: true,
     environment: 'happy-dom',
     setupFiles: ['./src/test/setup.ts'],
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    exclude: ['node_modules', 'dist', 'e2e'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -30,6 +32,11 @@ export default defineConfig({
         'src/**/*.test.tsx',
         'src/**/*.d.ts',
         'src/manifest.json',
+        // Entry points: side-effect-only bootstrap files
+        'src/background/index.ts',
+        'src/popup/index.tsx',
+        // Type-only declarations file
+        'src/types/index.ts',
       ],
     },
   },

@@ -1,5 +1,3 @@
-// Attribution footer link
-
 export function Footer() {
   return (
     <div className="trust-insights-link">

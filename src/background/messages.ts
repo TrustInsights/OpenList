@@ -3,7 +3,7 @@
 import { getMetrics, getSwState } from '@/background/metrics';
 import { openList } from '@/background/open-list';
 import { IncomingMessageSchema } from '@/schemas/messages';
-import type { OpenListResult } from '@/types';
+import { toErrorMessage } from '@/utils/errors';
 import { logger } from '@/utils/logger';
 
 type SendResponse = (response: unknown) => void;
@@ -32,9 +32,9 @@ export function handleMessage(
 
   if (msg.action === 'openList') {
     openList(msg.urls)
-      .then((results: OpenListResult) => sendResponse({ status: 'complete', results }))
+      .then((results) => sendResponse({ status: 'complete', results }))
       .catch((err: unknown) => {
-        const message = err instanceof Error ? err.message : String(err);
+        const message = toErrorMessage(err);
         logger.error('Error processing URL list', { error: message });
         sendResponse({ status: 'error', message, details: 'Failed to process URLs' });
       });
@@ -45,32 +45,26 @@ export function handleMessage(
     Promise.all([getMetrics(), getSwState()])
       .then(([metrics, swState]) => {
         sendResponse({
-          status: 'success',
-          metrics: {
-            ...metrics,
-            serviceWorkerState: swState,
-            uptime: Date.now() - metrics.startTime,
-          },
+          metrics,
+          serviceWorkerState: swState,
+          uptime: Date.now() - metrics.startTime,
         });
       })
       .catch((err: unknown) => {
-        const message = err instanceof Error ? err.message : String(err);
+        const message = toErrorMessage(err);
         sendResponse({ status: 'error', message });
       });
     return true;
   }
 
-  if (msg.action === 'getCurrentTabUrls') {
-    chrome.tabs
-      .query({ currentWindow: true })
-      .then((tabs) => sendResponse(tabs.map((t) => t.url).filter(Boolean)))
-      .catch((err: unknown) => {
-        const message = err instanceof Error ? err.message : String(err);
-        logger.error('Error fetching current tab URLs', { error: message });
-        sendResponse([]);
-      });
-    return true;
-  }
-
-  return false;
+  // msg.action === 'getCurrentTabUrls' (exhaustive — discriminated union)
+  chrome.tabs
+    .query({ currentWindow: true })
+    .then((tabs) => sendResponse(tabs.map((t) => t.url).filter(Boolean)))
+    .catch((err: unknown) => {
+      const message = toErrorMessage(err);
+      logger.error('Error fetching current tab URLs', { error: message });
+      sendResponse([]);
+    });
+  return true;
 }

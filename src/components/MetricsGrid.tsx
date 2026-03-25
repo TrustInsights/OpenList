@@ -1,5 +1,3 @@
-// Metrics display grid — replaces innerHTML-based rendering
-
 interface MetricsGridProps {
   successRate: string;
   tabsOpened: number;

@@ -1,5 +1,3 @@
-// Hook for polling extension metrics from the service worker
-
 import { MetricsResponseSchema } from '@/schemas/metrics';
 import { formatDuration } from '@/utils/format';
 import { useEffect, useState } from 'react';

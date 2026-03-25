@@ -1,5 +1,4 @@
-// React error boundary for catching component-level errors
-
+import { logger } from '@/utils/logger';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 
 interface Props {
@@ -23,10 +22,10 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   override componentDidCatch(error: Error, info: ErrorInfo): void {
-    // Error boundary caught: log in dev, silent in production
-    if (import.meta.env.DEV) {
-      console.error('ErrorBoundary caught:', error, info);
-    }
+    logger.error('ErrorBoundary caught', {
+      message: error.message,
+      componentStack: info.componentStack,
+    });
   }
 
   override render(): ReactNode {

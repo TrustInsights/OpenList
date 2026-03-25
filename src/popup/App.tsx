@@ -1,5 +1,3 @@
-// Root popup component
-
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ErrorDisplay } from '@/components/ErrorDisplay';
 import { Footer } from '@/components/Footer';
@@ -15,7 +13,6 @@ function PopupContent() {
   const { isLoading, result, error, openUrls } = useOpenUrls();
   const metrics = useMetrics();
 
-  // Focus textarea and pre-populate with current tab URLs on mount
   useEffect(() => {
     textareaRef.current?.focus();
     chrome.runtime

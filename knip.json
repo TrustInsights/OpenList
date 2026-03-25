@@ -1,6 +1,5 @@
 {
   "entry": ["src/background/index.ts", "src/popup/index.tsx"],
   "project": ["src/**/*.ts", "src/**/*.tsx"],
-  "ignore": ["src/test/**", "e2e/**"],
-  "ignoreDependencies": ["@types/chrome"]
+  "ignoreExportsUsedInFile": true
 }

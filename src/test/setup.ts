@@ -1,14 +1,13 @@
 // Vitest setup: Chrome API mocks for extension tests
 
+import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
-// Mock chrome.tabs
 const mockTabs = {
   create: vi.fn().mockResolvedValue({ id: 1, url: 'https://example.com' }),
   query: vi.fn().mockResolvedValue([]),
 };
 
-// Mock chrome.runtime
 const mockRuntime = {
   sendMessage: vi.fn().mockResolvedValue({}),
   onMessage: {
@@ -24,19 +23,16 @@ const mockRuntime = {
   lastError: null as chrome.runtime.LastError | null,
 };
 
-// Mock chrome.storage.session
 const mockStorageSession = {
   get: vi.fn().mockResolvedValue({}),
   set: vi.fn().mockResolvedValue(undefined),
 };
 
-// Mock chrome.storage.local
 const mockStorageLocal = {
   get: vi.fn().mockResolvedValue({}),
   set: vi.fn().mockResolvedValue(undefined),
 };
 
-// Mock chrome.contextMenus
 const mockContextMenus = {
   create: vi.fn().mockResolvedValue(undefined),
   removeAll: vi.fn().mockResolvedValue(undefined),
@@ -45,13 +41,11 @@ const mockContextMenus = {
   },
 };
 
-// Mock chrome.action
 const mockAction = {
   setBadgeText: vi.fn().mockResolvedValue(undefined),
   setBadgeBackgroundColor: vi.fn().mockResolvedValue(undefined),
 };
 
-// Assign to global
 global.chrome = {
   tabs: mockTabs,
   runtime: mockRuntime,

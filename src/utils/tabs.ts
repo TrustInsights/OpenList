@@ -10,10 +10,7 @@ const RETRY_DELAY_MS = 500;
  * @param retries - Number of retry attempts (default 2)
  * @returns The created Chrome tab
  */
-export async function createTab(
-  url: string,
-  retries = 2
-): Promise<chrome.tabs.Tab> {
+export async function createTab(url: string, retries = 2): Promise<chrome.tabs.Tab> {
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       return await chrome.tabs.create({ url, active: false });
@@ -24,6 +21,5 @@ export async function createTab(
       await new Promise<void>((resolve) => setTimeout(resolve, delay));
     }
   }
-  // Unreachable — loop always throws or returns
   throw new Error(`Failed to create tab for ${url}`);
 }

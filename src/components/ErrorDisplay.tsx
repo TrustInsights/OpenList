@@ -1,5 +1,3 @@
-// Error display component — replaces showError() DOM manipulation
-
 const MAX_VISIBLE_ERRORS = 3;
 
 interface ErrorDisplayProps {

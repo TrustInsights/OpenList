@@ -1,4 +1,4 @@
-// Service Worker Entry Point — metrics persistence via chrome.storage.session
+// Metrics persistence via chrome.storage.session
 
 import {
   DEFAULT_METRICS,
@@ -34,6 +34,7 @@ export async function setMetrics(metrics: ExtensionMetrics): Promise<void> {
 /**
  * Increments a numeric counter in session storage atomically.
  * @param field - The metrics field to increment
+ * @param amount - How much to increment by (default 1)
  */
 export async function incrementMetric(
   field: 'tabsOpened' | 'tabsFailed' | 'urlsProcessed',

@@ -8,8 +8,6 @@ export const UrlValidationResultSchema = z.object({
   original: z.string(),
 });
 
-export type UrlValidationResult = z.infer<typeof UrlValidationResultSchema>;
-
 /** Protocols blocked for security reasons */
 export const BLOCKED_PROTOCOLS = [
   'javascript:',
