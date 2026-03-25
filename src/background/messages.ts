@@ -1,5 +1,3 @@
-// Message handler dispatch — validates with Zod then routes to handlers
-
 import { getMetrics, getSwState } from '@/background/metrics';
 import { openList } from '@/background/open-list';
 import { IncomingMessageSchema } from '@/schemas/messages';

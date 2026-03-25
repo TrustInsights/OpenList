@@ -1,8 +1,7 @@
-// Context menu initialization with retry logic
-
 import { CONFIG } from '@/schemas/config';
 import { toErrorMessage } from '@/utils/errors';
 import { logger } from '@/utils/logger';
+import { sleep } from '@/utils/tabs';
 
 const MENU_ITEM = {
   id: CONFIG.CONTEXT_MENU_ID,
@@ -24,7 +23,7 @@ export async function initializeContextMenu(): Promise<void> {
     logger.error('Context menu creation failed, retrying', {
       error: toErrorMessage(err),
     });
-    await new Promise<void>((resolve) => setTimeout(resolve, 1000));
+    await sleep(1000);
     await chrome.contextMenus.create(MENU_ITEM);
     logger.info('Context menu created on retry');
   }

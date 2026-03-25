@@ -1,5 +1,3 @@
-// Structured logger — calls are no-ops in production builds
-
 type LogLevel = 'info' | 'warn' | 'error';
 
 interface LogEntry {

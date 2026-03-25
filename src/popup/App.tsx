@@ -5,6 +5,7 @@ import { MetricsGrid } from '@/components/MetricsGrid';
 import { StatusBar } from '@/components/StatusBar';
 import { useMetrics } from '@/hooks/useMetrics';
 import { useOpenUrls } from '@/hooks/useOpenUrls';
+import { GetCurrentTabUrlsMessageSchema } from '@/schemas/messages';
 import { useEffect, useRef, useState } from 'react';
 
 function PopupContent() {
@@ -16,7 +17,7 @@ function PopupContent() {
   useEffect(() => {
     textareaRef.current?.focus();
     chrome.runtime
-      .sendMessage({ action: 'getCurrentTabUrls' })
+      .sendMessage(GetCurrentTabUrlsMessageSchema.parse({ action: 'getCurrentTabUrls' }))
       .then((urls: unknown) => {
         if (Array.isArray(urls) && urls.length > 0) {
           setUrlText((urls as string[]).join('\n'));

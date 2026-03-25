@@ -1,6 +1,7 @@
 // Unit tests for background/metrics.ts
 
 import {
+  batchIncrementMetrics,
   getMetrics,
   getSwState,
   incrementMetric,
@@ -179,5 +180,51 @@ describe('setSwState', () => {
     };
     await setSwState(state);
     expect(chrome.storage.session.set).toHaveBeenCalledWith({ swState: state });
+  });
+});
+
+describe('batchIncrementMetrics', () => {
+  const stored = {
+    tabsOpened: 10,
+    tabsFailed: 2,
+    urlsProcessed: 12,
+    lastError: null,
+    startTime: 1000,
+    lastOperation: null,
+  };
+
+  beforeEach(() => {
+    chrome.storage.session.get = vi.fn().mockResolvedValue({ metrics: stored });
+    chrome.storage.session.set = vi.fn().mockResolvedValue(undefined);
+  });
+
+  it('increments all three counters in a single write', async () => {
+    await batchIncrementMetrics({ tabsOpened: 3, tabsFailed: 1, urlsProcessed: 4 });
+    expect(chrome.storage.session.set).toHaveBeenCalledTimes(1);
+    expect(chrome.storage.session.set).toHaveBeenCalledWith({
+      metrics: expect.objectContaining({
+        tabsOpened: 13,
+        tabsFailed: 3,
+        urlsProcessed: 16,
+      }),
+    });
+  });
+
+  it('uses 0 for omitted fields', async () => {
+    await batchIncrementMetrics({ tabsOpened: 5 });
+    expect(chrome.storage.session.set).toHaveBeenCalledWith({
+      metrics: expect.objectContaining({
+        tabsOpened: 15,
+        tabsFailed: 2,
+        urlsProcessed: 12,
+      }),
+    });
+  });
+
+  it('preserves unrelated fields', async () => {
+    await batchIncrementMetrics({ urlsProcessed: 2 });
+    expect(chrome.storage.session.set).toHaveBeenCalledWith({
+      metrics: expect.objectContaining({ lastError: null, startTime: 1000 }),
+    });
   });
 });

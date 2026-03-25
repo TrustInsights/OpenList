@@ -1,5 +1,3 @@
-// Service Worker Entry Point
-
 import { initializeContextMenu } from '@/background/context-menu';
 import { handleMessage } from '@/background/messages';
 import { getSwState, setSwState } from '@/background/metrics';

@@ -1,5 +1,20 @@
-import { createTab } from '@/utils/tabs';
+import { createTab, sleep } from '@/utils/tabs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
+describe('sleep', () => {
+  it('resolves after the specified duration', async () => {
+    vi.useFakeTimers();
+    let resolved = false;
+    const promise = sleep(500).then(() => {
+      resolved = true;
+    });
+    expect(resolved).toBe(false);
+    await vi.advanceTimersByTimeAsync(500);
+    await promise;
+    expect(resolved).toBe(true);
+    vi.useRealTimers();
+  });
+});
 
 afterEach(() => {
   vi.useRealTimers();

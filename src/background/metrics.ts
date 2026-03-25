@@ -1,5 +1,3 @@
-// Metrics persistence via chrome.storage.session
-
 import {
   DEFAULT_METRICS,
   DEFAULT_SW_STATE,
@@ -17,9 +15,7 @@ const SW_STATE_KEY = 'swState';
  */
 export async function getMetrics(): Promise<ExtensionMetrics> {
   const result = await chrome.storage.session.get(METRICS_KEY);
-  const raw = result[METRICS_KEY];
-  if (!raw) return { ...DEFAULT_METRICS, startTime: Date.now() };
-  const parsed = ExtensionMetricsSchema.safeParse(raw);
+  const parsed = ExtensionMetricsSchema.safeParse(result[METRICS_KEY]);
   return parsed.success ? parsed.data : { ...DEFAULT_METRICS, startTime: Date.now() };
 }
 
@@ -45,6 +41,24 @@ export async function incrementMetric(
 }
 
 /**
+ * Increments multiple counters in a single read-modify-write cycle.
+ * Avoids the race condition that occurs when concurrent incrementMetric calls
+ * each read the same stale snapshot and overwrite each other.
+ * @param deltas - Map of field names to increment amounts
+ */
+export async function batchIncrementMetrics(
+  deltas: Partial<Pick<ExtensionMetrics, 'tabsOpened' | 'tabsFailed' | 'urlsProcessed'>>
+): Promise<void> {
+  const metrics = await getMetrics();
+  await setMetrics({
+    ...metrics,
+    tabsOpened: metrics.tabsOpened + (deltas.tabsOpened ?? 0),
+    tabsFailed: metrics.tabsFailed + (deltas.tabsFailed ?? 0),
+    urlsProcessed: metrics.urlsProcessed + (deltas.urlsProcessed ?? 0),
+  });
+}
+
+/**
  * Records the last error message in metrics.
  * @param message - Error message to record
  */
@@ -59,9 +73,7 @@ export async function recordError(message: string): Promise<void> {
  */
 export async function getSwState(): Promise<ServiceWorkerState> {
   const result = await chrome.storage.session.get(SW_STATE_KEY);
-  const raw = result[SW_STATE_KEY];
-  if (!raw) return { ...DEFAULT_SW_STATE };
-  const parsed = ServiceWorkerStateSchema.safeParse(raw);
+  const parsed = ServiceWorkerStateSchema.safeParse(result[SW_STATE_KEY]);
   return parsed.success ? parsed.data : { ...DEFAULT_SW_STATE };
 }
 

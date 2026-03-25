@@ -15,7 +15,7 @@ describe('openList', () => {
       url: 'https://example.com',
     } as chrome.tabs.Tab);
     // Stub metric calls to avoid storage side effects
-    vi.spyOn(metricsModule, 'incrementMetric').mockResolvedValue(undefined);
+    vi.spyOn(metricsModule, 'batchIncrementMetrics').mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -148,9 +148,11 @@ describe('openList', () => {
     const result = await promise;
 
     expect(result.successful).toBe(2);
-    expect(metricsModule.incrementMetric).toHaveBeenCalledWith('tabsOpened', 2);
-    expect(metricsModule.incrementMetric).toHaveBeenCalledWith('tabsFailed', 0);
-    expect(metricsModule.incrementMetric).toHaveBeenCalledWith('urlsProcessed', 2);
+    expect(metricsModule.batchIncrementMetrics).toHaveBeenCalledWith({
+      tabsOpened: 2,
+      tabsFailed: 0,
+      urlsProcessed: 2,
+    });
   });
 
   it('totalTime is set and non-negative', async () => {

@@ -1,5 +1,6 @@
-import { OpenListResponseSchema } from '@/schemas/messages';
+import { OpenListMessageSchema, OpenListResponseSchema } from '@/schemas/messages';
 import type { OpenListResult } from '@/types';
+import { toErrorMessage } from '@/utils/errors';
 import { useCallback, useState } from 'react';
 
 interface OpenUrlsState {
@@ -32,7 +33,9 @@ export function useOpenUrls(): OpenUrlsState & { openUrls: (text: string) => Pro
     setState({ isLoading: true, result: null, error: null });
 
     try {
-      const raw = await chrome.runtime.sendMessage({ action: 'openList', urls: text });
+      const raw = await chrome.runtime.sendMessage(
+        OpenListMessageSchema.parse({ action: 'openList', urls: text })
+      );
       const parsed = OpenListResponseSchema.safeParse(raw);
 
       if (!parsed.success) {
@@ -43,8 +46,7 @@ export function useOpenUrls(): OpenUrlsState & { openUrls: (text: string) => Pro
 
       setState({ isLoading: false, result: parsed.data.results, error: null });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to open tabs';
-      setState({ isLoading: false, result: null, error: message });
+      setState({ isLoading: false, result: null, error: toErrorMessage(err) });
     }
   }, []);
 

@@ -1,3 +1,4 @@
+import { GetMetricsMessageSchema } from '@/schemas/messages';
 import { MetricsResponseSchema } from '@/schemas/metrics';
 import { formatDuration } from '@/utils/format';
 import { useEffect, useState } from 'react';
@@ -30,7 +31,9 @@ export function useMetrics(): MetricsState {
   useEffect(() => {
     async function fetchMetrics(): Promise<void> {
       try {
-        const response = await chrome.runtime.sendMessage({ action: 'getMetrics' });
+        const response = await chrome.runtime.sendMessage(
+          GetMetricsMessageSchema.parse({ action: 'getMetrics' })
+        );
         const parsed = MetricsResponseSchema.safeParse(response);
 
         if (!parsed.success) {
@@ -43,12 +46,24 @@ export function useMetrics(): MetricsState {
           ? ((metrics.tabsOpened / metrics.urlsProcessed) * 100).toFixed(1)
           : '100';
 
-        setState({
-          successRate,
-          tabsOpened: metrics.tabsOpened,
-          tabsFailed: metrics.tabsFailed,
-          uptime: formatDuration(parsed.data.uptime),
-          error: false,
+        setState((prev) => {
+          const uptime = formatDuration(parsed.data.uptime);
+          if (
+            prev.successRate === successRate &&
+            prev.tabsOpened === metrics.tabsOpened &&
+            prev.tabsFailed === metrics.tabsFailed &&
+            prev.uptime === uptime &&
+            !prev.error
+          ) {
+            return prev;
+          }
+          return {
+            successRate,
+            tabsOpened: metrics.tabsOpened,
+            tabsFailed: metrics.tabsFailed,
+            uptime,
+            error: false,
+          };
         });
       } catch {
         setState((s) => ({ ...s, error: true }));

@@ -108,7 +108,7 @@ describe('useOpenUrls', () => {
     expect(result.current.isLoading).toBe(false);
   });
 
-  it('sets error "Failed to open tabs" when non-Error is thrown', async () => {
+  it('sets error from String() when non-Error is thrown', async () => {
     chrome.runtime.sendMessage = vi.fn().mockRejectedValue('non-error string');
     const { result } = renderHook(() => useOpenUrls());
 
@@ -116,7 +116,7 @@ describe('useOpenUrls', () => {
       await result.current.openUrls('https://example.com');
     });
 
-    expect(result.current.error).toBe('Failed to open tabs');
+    expect(result.current.error).toBe('non-error string');
   });
 
   it('returns stable openUrls reference (useCallback)', () => {
