@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "OpenList",
+  "version": "1.0.2",
+  "description": "Manage and open lists of URLs. Select URLs in any webpage or paste them to open in new tabs. Updated by TrustInsights.ai.",
+  "permissions": [
+    "contextMenus",
+    "storage",
+    "tabs"
+  ],
+  "action": {
+    "default_popup": "popup/index.html",
+    "default_icon": {
+      "16": "icon/icon-16.png",
+      "48": "icon/icon-48.png",
+      "128": "icon/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "icon/icon-16.png",
+    "48": "icon/icon-48.png",
+    "128": "icon/icon-128.png"
+  },
+  "background": {
+    "service_worker": "background/index.js",
+    "type": "module"
+  },
+  "minimum_chrome_version": "102",
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests;"
+  }
+}
