@@ -6,10 +6,12 @@ import type { AddressInfo } from 'node:net';
 import path from 'node:path';
 import {
   type BrowserContext,
+  type ConsoleMessage,
   type Page,
   type Worker,
   test as base,
   chromium,
+  expect,
 } from '@playwright/test';
 
 const EXTENSION_PATH = path.join(import.meta.dirname, '../../dist');
@@ -33,6 +35,8 @@ interface Fixtures {
    * cannot click the Chrome prompt.
    */
   grantClipboard: boolean;
+  /** Collects console and page errors and fails the test when any appears. */
+  errorGuard: undefined;
   extensionId: string;
   worker: Worker;
   site: Site;
@@ -89,6 +93,27 @@ export const test = base.extend<Fixtures>({
     await rm(profile, { recursive: true, force: true });
   },
 
+  // Every test fails on a console error, a page error, or a worker error, whatever it checks.
+  errorGuard: [
+    async ({ context }, use): Promise<void> => {
+      const errors: string[] = [];
+      const keep = (message: ConsoleMessage): void => {
+        if (message.type() === 'error')
+          errors.push(`${message.text()} (${message.location().url})`);
+      };
+      context.on('console', keep);
+      context.on('weberror', (webError) => errors.push(webError.error().message));
+      const watch = (worker: Worker): void => {
+        worker.on('console', keep);
+      };
+      context.serviceWorkers().forEach(watch);
+      context.on('serviceworker', watch);
+      await use(undefined);
+      expect(errors).toEqual([]);
+    },
+    { auto: true },
+  ],
+
   worker: async ({ context }, use): Promise<void> => {
     const [existing] = context.serviceWorkers();
     await use(existing ?? (await context.waitForEvent('serviceworker')));
@@ -101,7 +126,12 @@ export const test = base.extend<Fixtures>({
   // biome-ignore lint/correctness/noEmptyPattern: Playwright requires an object pattern in fixtures
   site: async ({}, use): Promise<void> => {
     const server = createServer((request, response) => {
-      const name = /^\/([a-z])\.html$/.exec(new URL(request.url ?? '/', 'http://x').pathname)?.[1];
+      const pathname = new URL(request.url ?? '/', 'http://x').pathname;
+      if (pathname === '/favicon.ico') {
+        response.writeHead(204).end();
+        return;
+      }
+      const name = /^\/([a-z])\.html$/.exec(pathname)?.[1];
       if (name === undefined) {
         response.writeHead(404).end();
         return;
@@ -150,4 +180,4 @@ export const test = base.extend<Fixtures>({
   },
 });
 
-export { expect } from '@playwright/test';
+export { expect };

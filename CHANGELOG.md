@@ -14,7 +14,7 @@ Nothing yet.
 
 ### Fixed (owner bug report)
 
-- Chrome no longer lists a Content Security Policy error for `assets/zod-*.js` on the extension Errors page. Zod now runs with its JIT compiler off, and the policy stays strict. Tests: `tests/e2e/csp.spec.ts` and `tests/unit/schemas/zod.test.ts`.
+- Chrome no longer lists a Content Security Policy error for `assets/zod-*.js` on the extension Errors page. Zod now runs with its JIT compiler off, and the policy stays strict. Tests: `tests/unit/schemas/zod.test.ts`, and an error guard in `tests/e2e/fixtures.ts` that fails every end-to-end test on a console error, a page error, or a worker error (it also caught the test site answering `/favicon.ico` with 404, now 204).
 
 ### Changed (Chisle review, owner decision 24)
 
