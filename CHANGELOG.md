@@ -7,6 +7,7 @@ All notable changes to OpenList are listed here. The format follows [Keep a Chan
 ### Added (distribution, 2026-11-17)
 
 - `pnpm package` builds the extension and writes `output/artifacts/openlist-<version>.zip` through `src/tools/package-release.sh`. The tool checks the manifest version against `package.json`, the service worker file, and the zip layout. Tests: `tests/unit/tools/package-release.test.ts`.
+- The manifest description (the store summary) now reads: "Open a list of URLs as tabs, or copy your open tabs as Markdown, CSV, JSON, and more. Updated by TrustInsights.ai."
 - `docs/privacy-policy.md`, `docs/store-listing.md` (draft), and `docs/release-checklist.md`.
 
 ### Fixed (substance audit, 2026-11-16)
