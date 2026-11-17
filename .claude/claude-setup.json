@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "categories": [
+    "chrome",
+    "research"
+  ],
+  "bank": "openlist",
+  "delivered": [
+    ".claude/plugins/plugin-deep-research-suite",
+    ".claude/plugins/plugin-peer-review",
+    ".claude/plugins/plugin-prd-permissions",
+    ".claude/settings.local.json",
+    ".claude/skills/skill-deep-research-prompt",
+    ".claude/skills/skill-factcheck",
+    ".claude/skills/skill-peer-review",
+    ".claude/skills/skill-peer-review-compare",
+    ".claude/skills/skill-peer-review-maintain",
+    ".claude/skills/skill-peer-review-score",
+    ".claude/skills/skill-peer-review-triage",
+    ".claude/skills/skill-prompt-optimizer",
+    ".claude/skills/skill-qa-chrome",
+    ".claude/skills/skill-research-merge",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "claude-graphify-semantic.sh",
+    "docs/asd-ste.yaml",
+    "docs/checklist-human-writing-qa.yaml",
+    "docs/checklist-peer-review.yaml",
+    "docs/installedtools.md",
+    "docs/orientation.md",
+    "docs/rules-chrome-ext.md",
+    "docs/trust-insights-brand"
+  ]
+}

@@ -1,0 +1,53 @@
+/* Popup adaptations: narrow width, reduced motion, and forced colors. Loaded after main.css and panels.css. */
+@media (max-width: 360px) {
+  .list-area {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "label"
+      "from"
+      "box";
+  }
+
+  .source select {
+    flex: 1;
+  }
+
+  .actions {
+    flex-wrap: wrap;
+  }
+
+  .example {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
+
+  button:hover,
+  button:active {
+    transform: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  button,
+  select,
+  .list-box,
+  .error-container {
+    border: 1px solid ButtonText;
+  }
+
+  .btn-open {
+    border: 2px solid ButtonText;
+  }
+
+  :focus-visible {
+    outline: 2px solid Highlight;
+  }
+}

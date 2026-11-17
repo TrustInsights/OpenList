@@ -1,4 +1,5 @@
-import { getMetrics, getSwState } from '@/background/metrics';
+// Runtime message validation and dispatch for the service worker
+
 import { openList } from '@/background/open-list';
 import { IncomingMessageSchema } from '@/schemas/messages';
 import { toErrorMessage } from '@/utils/errors';
@@ -26,43 +27,18 @@ export function handleMessage(
     return false;
   }
 
-  const msg = parsed.data;
+  const { urls } = parsed.data;
 
-  if (msg.action === 'openList') {
-    openList(msg.urls)
-      .then((results) => sendResponse({ status: 'complete', results }))
-      .catch((err: unknown) => {
-        const message = toErrorMessage(err);
-        logger.error('Error processing URL list', { error: message });
-        sendResponse({ status: 'error', message, details: 'Failed to process URLs' });
-      });
-    return true;
-  }
-
-  if (msg.action === 'getMetrics') {
-    Promise.all([getMetrics(), getSwState()])
-      .then(([metrics, swState]) => {
-        sendResponse({
-          metrics,
-          serviceWorkerState: swState,
-          uptime: Date.now() - metrics.startTime,
-        });
-      })
-      .catch((err: unknown) => {
-        const message = toErrorMessage(err);
-        sendResponse({ status: 'error', message });
-      });
-    return true;
-  }
-
-  // msg.action === 'getCurrentTabUrls' (exhaustive — discriminated union)
-  chrome.tabs
-    .query({ currentWindow: true })
-    .then((tabs) => sendResponse(tabs.map((t) => t.url).filter(Boolean)))
-    .catch((err: unknown) => {
+  const run = async (): Promise<void> => {
+    try {
+      const results = await openList(urls);
+      sendResponse({ status: 'complete', results });
+    } catch (err: unknown) {
       const message = toErrorMessage(err);
-      logger.error('Error fetching current tab URLs', { error: message });
-      sendResponse([]);
-    });
+      logger.error('Error processing URL list', { error: message });
+      sendResponse({ status: 'error', message, details: 'Failed to process URLs' });
+    }
+  };
+  void run();
   return true;
 }

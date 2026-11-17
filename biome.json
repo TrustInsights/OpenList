@@ -36,6 +36,6 @@
     }
   },
   "files": {
-    "ignore": ["dist", "node_modules", ".worktrees", "coverage", "e2e"]
+    "ignore": ["dist", "node_modules", ".worktrees", "coverage"]
   }
 }

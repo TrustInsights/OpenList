@@ -1,6 +1,7 @@
 // Test runner configuration — separate from vite.config.ts to prevent CRXJS plugin conflicts
-import react from '@vitejs/plugin-react';
+
 import { resolve } from 'node:path';
+import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
@@ -8,17 +9,19 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
+      '@tests': resolve(__dirname, './tests'),
     },
   },
   test: {
     globals: true,
     environment: 'happy-dom',
-    setupFiles: ['./src/test/setup.ts'],
-    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
-    exclude: ['node_modules', 'dist', 'e2e'],
+    setupFiles: ['./tests/setup.ts'],
+    include: ['tests/unit/**/*.test.ts', 'tests/unit/**/*.test.tsx'],
+    exclude: ['node_modules', 'dist', 'tests/e2e'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
+      reportsDirectory: './output/coverage',
       thresholds: {
         lines: 100,
         branches: 100,
@@ -27,9 +30,6 @@ export default defineConfig({
       },
       include: ['src/**/*.ts', 'src/**/*.tsx'],
       exclude: [
-        'src/test/**',
-        'src/**/*.test.ts',
-        'src/**/*.test.tsx',
         'src/**/*.d.ts',
         'src/manifest.json',
         // Entry points: side-effect-only bootstrap files

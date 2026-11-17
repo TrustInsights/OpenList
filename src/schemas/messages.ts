@@ -2,23 +2,32 @@
 
 import { z } from 'zod';
 
+/** Message that asks the background worker to open a list of URLs or search terms. */
 export const OpenListMessageSchema = z.object({
   action: z.literal('openList'),
   urls: z.string().min(1),
 });
 
-export const GetMetricsMessageSchema = z.object({
-  action: z.literal('getMetrics'),
+/** Any message the background worker accepts, keyed on its action. */
+export const IncomingMessageSchema = z.discriminatedUnion('action', [OpenListMessageSchema]);
+
+/** The text and the optional HTML flavor that the offscreen page puts on the clipboard. */
+const ClipboardPayloadSchema = z.object({
+  text: z.string(),
+  html: z.string().optional(),
 });
 
-export const GetCurrentTabUrlsMessageSchema = z.object({
-  action: z.literal('getCurrentTabUrls'),
+/** Message from the service worker that asks the offscreen page to write to the clipboard. */
+export const OffscreenCopyMessageSchema = z.object({
+  target: z.literal('offscreen'),
+  type: z.literal('copy'),
+  payload: ClipboardPayloadSchema,
 });
 
-export const IncomingMessageSchema = z.discriminatedUnion('action', [
-  OpenListMessageSchema,
-  GetMetricsMessageSchema,
-  GetCurrentTabUrlsMessageSchema,
+/** The offscreen page answer: success, or the error text. */
+export const OffscreenReplySchema = z.discriminatedUnion('ok', [
+  z.object({ ok: z.literal(true) }),
+  z.object({ ok: z.literal(false), error: z.string() }),
 ]);
 
 /** Response schema for the openList background action. */
@@ -30,5 +39,7 @@ export const OpenListResponseSchema = z.object({
     skipped: z.number().int().min(0),
     totalTime: z.number().min(0),
     errors: z.array(z.string()),
+    /** The input lines that opened a tab. */
+    opened: z.array(z.string()),
   }),
 });

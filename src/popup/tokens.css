@@ -1,0 +1,34 @@
+/* Design tokens: light and dark color values for the popup, checked by tests/unit/tokens-contrast.test.ts */
+:root {
+  --bg: #eeeeee;
+  --surface: #ffffff;
+  --text: #333333;
+  --muted: #5f6368;
+  --accent: #0b57d0;
+  --accent-hover: #0842a0;
+  --on-accent: #ffffff;
+  --border: #767676;
+  --err: #b3261e;
+  --err-bg: #fce8e6;
+  --err-border: #b3261e;
+  --sel-bg: #d3e3fd;
+  --sel-text: #041e49;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #202124;
+    --surface: #292a2d;
+    --text: #e8eaed;
+    --muted: #9aa0a6;
+    --accent: #8ab4f8;
+    --accent-hover: #aecbfa;
+    --on-accent: #202124;
+    --border: #8e918f;
+    --err: #f9b4ae;
+    --err-bg: #402022;
+    --err-border: #f9b4ae;
+    --sel-bg: #2f4468;
+    --sel-text: #d3e3fd;
+  }
+}

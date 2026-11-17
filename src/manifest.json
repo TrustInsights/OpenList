@@ -1,10 +1,21 @@
 {
   "manifest_version": 3,
   "name": "OpenList",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Manage and open lists of URLs. Select URLs in any webpage or paste them to open in new tabs. Updated by TrustInsights.ai.",
-  "permissions": ["contextMenus", "storage", "tabs"],
+  "permissions": ["contextMenus", "storage", "tabs", "offscreen"],
+  "optional_permissions": ["clipboardRead", "clipboardWrite"],
+  "commands": {
+    "copy-window": {
+      "suggested_key": {
+        "default": "Alt+Shift+C",
+        "mac": "Alt+Shift+C"
+      },
+      "description": "Copy this window's tabs"
+    }
+  },
   "action": {
+    "default_title": "OpenList: open or copy a list of URLs",
     "default_popup": "popup/index.html",
     "default_icon": {
       "16": "icon/icon-16.png",
@@ -21,7 +32,7 @@
     "service_worker": "background/index.ts",
     "type": "module"
   },
-  "minimum_chrome_version": "102",
+  "minimum_chrome_version": "110",
   "content_security_policy": {
     "extension_pages": "default-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests;"
   }

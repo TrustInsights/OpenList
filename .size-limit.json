@@ -1,0 +1,22 @@
+[
+  {
+    "path": "dist/assets/index.html-*.js",
+    "limit": "75 kB",
+    "gzip": true
+  },
+  {
+    "path": "dist/assets/zod-*.js",
+    "limit": "28 kB",
+    "gzip": true
+  },
+  {
+    "path": "dist/assets/offscreen-*.js",
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "path": "dist/assets/index.ts-*.js",
+    "limit": "5 kB",
+    "gzip": true
+  }
+]

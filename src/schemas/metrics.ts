@@ -1,41 +1,19 @@
-// Zod schema for extension metrics
+// Zod schema for the Details totals kept in local storage
 
 import { z } from 'zod';
 
-export const ExtensionMetricsSchema = z.object({
+/** Counters only. The totals never hold URLs or titles. */
+export const TotalsSchema = z.object({
   tabsOpened: z.number().int().min(0),
   tabsFailed: z.number().int().min(0),
   urlsProcessed: z.number().int().min(0),
   lastError: z.string().nullable(),
-  startTime: z.number(),
-  lastOperation: z.string().nullable(),
 });
 
-export const ServiceWorkerStateSchema = z.object({
-  installTime: z.number().nullable(),
-  activationTime: z.number().nullable(),
-  restarts: z.number().int().min(0),
-  lastContextMenuCreation: z.number().nullable(),
-});
-
-export const MetricsResponseSchema = z.object({
-  metrics: ExtensionMetricsSchema,
-  serviceWorkerState: ServiceWorkerStateSchema,
-  uptime: z.number().min(0),
-});
-
-export const DEFAULT_METRICS: z.infer<typeof ExtensionMetricsSchema> = {
+/** Zero totals that a missing or corrupt store reads as. */
+export const DEFAULT_TOTALS: z.infer<typeof TotalsSchema> = {
   tabsOpened: 0,
   tabsFailed: 0,
   urlsProcessed: 0,
   lastError: null,
-  startTime: 0,
-  lastOperation: null,
-};
-
-export const DEFAULT_SW_STATE: z.infer<typeof ServiceWorkerStateSchema> = {
-  installTime: null,
-  activationTime: null,
-  restarts: 0,
-  lastContextMenuCreation: null,
 };

@@ -1,8 +1,10 @@
-import { batchIncrementMetrics } from '@/background/metrics';
+// Opens a list of URLs and search terms in new tabs
+
 import { CONFIG } from '@/schemas/config';
 import type { OpenListResult } from '@/types';
 import { toErrorMessage } from '@/utils/errors';
 import { logger } from '@/utils/logger';
+import { addTotals, recordError } from '@/utils/metrics-store';
 import { createTab, sleep } from '@/utils/tabs';
 import { isProbablyUrl, sanitizeUrl } from '@/utils/urls';
 
@@ -19,6 +21,7 @@ export async function openList(list: string): Promise<OpenListResult> {
     skipped: 0,
     totalTime: 0,
     errors: [],
+    opened: [],
   };
 
   const lines = list.split(/\r\n|\r|\n/);
@@ -50,6 +53,7 @@ export async function openList(list: string): Promise<OpenListResult> {
 
       await createTab(url);
       results.successful++;
+      results.opened.push(trimmed);
 
       const hasMore = i < lines.length - 1;
       if (hasMore && results.successful < CONFIG.MAX_TABS) {
@@ -60,10 +64,15 @@ export async function openList(list: string): Promise<OpenListResult> {
       const msg = toErrorMessage(err);
       results.errors.push(`Failed to open ${trimmed}: ${msg}`);
       logger.error('Tab creation failed', { url: trimmed, error: msg });
+      try {
+        await recordError(`Failed to open a tab: ${msg}`);
+      } catch (recordErr) {
+        logger.error('Error record failed', { error: toErrorMessage(recordErr) });
+      }
     }
   }
 
-  await batchIncrementMetrics({
+  await addTotals({
     tabsOpened: results.successful,
     tabsFailed: results.failed,
     urlsProcessed: results.successful + results.failed,

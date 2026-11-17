@@ -1,0 +1,1 @@
+/Users/cspenn/code/masterlibraries/claude/docs/installedtools.md

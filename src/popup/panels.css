@@ -1,0 +1,124 @@
+/* Popup panels: error box, clipboard prompt, Details section, and footer link. Colors come from tokens.css. */
+.error-container {
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  color: var(--err);
+  background: var(--err-bg);
+  border: 1px solid var(--err-border);
+  border-radius: 8px;
+}
+
+.error-message {
+  margin: 0;
+  font-weight: 500;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.error-details {
+  margin: 4px 0 0;
+  padding-left: 20px;
+  font-size: 12px;
+}
+
+.clipboard-prompt {
+  margin-top: 8px;
+}
+
+.hint {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.prompt-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.details {
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  list-style: none;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+summary::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+}
+
+details[open] summary::before {
+  transform: rotate(45deg);
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 6px;
+  margin: 0 0 8px;
+}
+
+.metrics div {
+  padding: 6px 8px;
+  background: var(--surface);
+  border-radius: 8px;
+}
+
+.metrics dt {
+  font-size: 13px;
+  line-height: 1.25;
+  color: var(--muted);
+}
+
+.metrics dd {
+  margin: 2px 0 0;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.trust-insights-link {
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+.trust-insights-link a {
+  color: var(--accent);
+}
+
+/* In Details the prompt button shares the row of Refresh. The hint moves under the row. */
+.details-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.details .clipboard-prompt,
+.details .prompt-buttons {
+  display: contents;
+}
+
+.details .hint {
+  order: 1;
+  flex-basis: 100%;
+  margin: 0;
+}

@@ -1,12 +1,4 @@
-// Zod schemas for URL validation results
-
-import { z } from 'zod';
-
-export const UrlValidationResultSchema = z.object({
-  isValid: z.boolean(),
-  sanitized: z.string().nullable(),
-  original: z.string(),
-});
+// Blocked URL protocols
 
 /** Protocols blocked for security reasons */
 export const BLOCKED_PROTOCOLS = [

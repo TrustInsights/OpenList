@@ -1,7 +1,15 @@
+// Tab creation and sleep helpers
+
 import { logger } from '@/utils/logger';
 
 const RETRY_DELAY_MS = 500;
+const TAB_RETRIES = 2;
 
+/**
+ * Waits for a fixed time.
+ * @param ms - Delay in milliseconds
+ * @returns A promise that resolves after the delay
+ */
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -9,17 +17,16 @@ export function sleep(ms: number): Promise<void> {
 /**
  * Creates a new background tab for the given URL, retrying on failure.
  * @param url - The URL to open
- * @param retries - Number of retry attempts (default 2)
  * @returns The created Chrome tab
  */
-export async function createTab(url: string, retries = 2): Promise<chrome.tabs.Tab> {
+export async function createTab(url: string): Promise<chrome.tabs.Tab> {
   let lastError: unknown;
-  for (let attempt = 0; attempt <= retries; attempt++) {
+  for (let attempt = 0; attempt <= TAB_RETRIES; attempt++) {
     try {
       return await chrome.tabs.create({ url, active: false });
     } catch (err) {
       lastError = err;
-      if (attempt < retries) {
+      if (attempt < TAB_RETRIES) {
         const delay = RETRY_DELAY_MS * (attempt + 1);
         logger.warn('Tab creation failed, retrying', { url, attempt, delay });
         await sleep(delay);

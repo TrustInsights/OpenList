@@ -1,8 +1,10 @@
+// Shared types derived from Zod schemas
+
 import type { OpenListResponseSchema } from '@/schemas/messages';
-import type { ExtensionMetricsSchema, ServiceWorkerStateSchema } from '@/schemas/metrics';
+import type { TotalsSchema } from '@/schemas/metrics';
 import type { z } from 'zod';
 
-// Derive types from Zod schemas — single source of truth
+/** Reply of openList: counts, error texts, and `opened` (the input lines that opened a tab). */
 export type OpenListResult = z.infer<typeof OpenListResponseSchema>['results'];
-export type ExtensionMetrics = z.infer<typeof ExtensionMetricsSchema>;
-export type ServiceWorkerState = z.infer<typeof ServiceWorkerStateSchema>;
+/** Counter totals kept in local storage. Never holds URLs or titles. */
+export type Totals = z.infer<typeof TotalsSchema>;

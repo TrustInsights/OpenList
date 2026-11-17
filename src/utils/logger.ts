@@ -1,3 +1,5 @@
+// Structured logger for the extension
+
 type LogLevel = 'info' | 'warn' | 'error';
 
 interface LogEntry {

@@ -10,15 +10,16 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@tests/*": ["tests/*"]
     },
-    "types": ["chrome", "vite/client", "vitest/globals"],
+    "types": ["chrome", "vite/client", "vitest/globals", "node"],
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "tests/**/*", "*.config.ts"],
   "exclude": ["node_modules", "dist", ".worktrees"]
 }

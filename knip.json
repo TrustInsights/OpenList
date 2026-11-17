@@ -1,5 +1,11 @@
 {
-  "entry": ["src/background/index.ts", "src/popup/index.tsx"],
-  "project": ["src/**/*.ts", "src/**/*.tsx"],
-  "ignoreExportsUsedInFile": true
+  "entry": [
+    "src/background/index.ts!",
+    "src/popup/index.tsx!"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}!",
+    "tests/**/*.{ts,tsx}",
+    "*.config.ts"
+  ]
 }

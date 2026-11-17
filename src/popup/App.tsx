@@ -1,89 +1,116 @@
+// Popup root component: wires the state hooks to the components in the design layout order
+
+import { ActionButtons } from '@/components/ActionButtons';
+import { ClipboardPrompt } from '@/components/ClipboardPrompt';
+import { DetailsPanel } from '@/components/DetailsPanel';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ErrorDisplay } from '@/components/ErrorDisplay';
 import { Footer } from '@/components/Footer';
-import { MetricsGrid } from '@/components/MetricsGrid';
-import { StatusBar } from '@/components/StatusBar';
-import { useMetrics } from '@/hooks/useMetrics';
-import { useOpenUrls } from '@/hooks/useOpenUrls';
-import { GetCurrentTabUrlsMessageSchema } from '@/schemas/messages';
-import { useEffect, useRef, useState } from 'react';
+import { FormatSelect } from '@/components/FormatSelect';
+import { SourceSelect } from '@/components/SourceSelect';
+import { StatusLine } from '@/components/StatusLine';
+import { UrlList } from '@/components/UrlList';
+import { useDetails } from '@/hooks/useDetails';
+import { useFormat } from '@/hooks/useFormat';
+import { EMPTY_LIST_ERROR, useListActions } from '@/hooks/useListActions';
+import { useSources } from '@/hooks/useSources';
+import { useEffect, useState } from 'react';
 
-function PopupContent() {
-  const [urlText, setUrlText] = useState('');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { isLoading, result, error, openUrls } = useOpenUrls();
-  const metrics = useMetrics();
+/**
+ * Renders the popup. One list holds the URLs. Open and Copy both work on that list.
+ * The status line shows the newest message from a source change or from an action.
+ * While Details is open, the clipboard button moves into it, so the popup stays within 600 px.
+ * @returns The popup content.
+ */
+function PopupContent(): React.JSX.Element {
+  const sources = useSources();
+  const { format, changeFormat } = useFormat();
+  const details = useDetails();
+  const actions = useListActions({
+    text: sources.text,
+    setText: sources.setText,
+    known: sources.known,
+    format,
+  });
+  const [status, setStatus] = useState({ text: '', id: 'start' });
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const { notice, noticeSeq } = sources;
+  const { status: actionStatus, statusSeq } = actions;
 
+  // A new write counts even when its text equals the old text. The id names the write.
   useEffect(() => {
-    textareaRef.current?.focus();
-    chrome.runtime
-      .sendMessage(GetCurrentTabUrlsMessageSchema.parse({ action: 'getCurrentTabUrls' }))
-      .then((urls: unknown) => {
-        if (Array.isArray(urls) && urls.length > 0) {
-          setUrlText((urls as string[]).join('\n'));
-        }
-      })
-      .catch(() => {
-        // Silently ignore — textarea stays empty
-      });
-  }, []);
+    setStatus({ text: notice, id: `notice-${noticeSeq}` });
+  }, [notice, noticeSeq]);
+  useEffect(() => {
+    setStatus({ text: actionStatus, id: `action-${statusSeq}` });
+  }, [actionStatus, statusSeq]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && e.ctrlKey) {
-      e.preventDefault();
-      void openUrls(urlText);
-    }
+  const open = (): void => {
+    if (actions.running) return;
+    void (async (): Promise<void> => {
+      await actions.open();
+      await details.refresh();
+    })();
   };
-
-  const statusMessage = result
-    ? `Opened ${result.successful} tab${result.successful !== 1 ? 's' : ''} (${result.failed} failed, ${result.skipped} skipped) in ${(result.totalTime / 1000).toFixed(1)}s`
-    : '';
+  // The empty-list error goes away as soon as the user types.
+  const typedSince = actions.error === EMPTY_LIST_ERROR && sources.text.trim() !== '';
+  const error = typedSince ? null : actions.error;
+  const emptyListError = error === EMPTY_LIST_ERROR;
 
   return (
-    <>
-      <textarea
-        id="list"
-        ref={textareaRef}
-        value={urlText}
-        onChange={(e) => setUrlText(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="Paste URLs here, one per line. Will also convert text to search queries."
-        spellCheck={false}
+    <main className="popup">
+      <h1>OpenList</h1>
+      <div className="list-area">
+        <UrlList
+          value={sources.text}
+          onChange={sources.setText}
+          invalid={emptyListError}
+          describedBy={emptyListError ? 'list-error' : undefined}
+          onOpen={open}
+        />
+        <SourceSelect
+          options={sources.options}
+          value={sources.source}
+          onChange={sources.changeSource}
+        />
+      </div>
+      {error !== null && <ErrorDisplay id="list-error" message={error} />}
+      <ActionButtons
+        openLabel={actions.openLabel}
+        copyLabel={actions.copyLabel}
+        onOpen={open}
+        onCopy={() => void actions.copy()}
+        disabled={actions.running}
       />
-      <div className="button-container">
-        <StatusBar message={statusMessage} />
-        <button
-          id="openButton"
-          type="button"
-          disabled={isLoading}
-          title="Open these URLs in new tabs"
-          onClick={() => void openUrls(urlText)}
-        >
-          Open URLs
-        </button>
-      </div>
-      {error && <ErrorDisplay message={error} />}
-      {result?.errors && result.errors.length > 0 && (
-        <ErrorDisplay message="Some URLs failed to open" details={result.errors} />
+      <FormatSelect value={format} onChange={changeFormat} example={actions.example} />
+      <StatusLine message={status.text} id={status.id} />
+      {sources.clipboardPrompt === 'button' && !detailsOpen && (
+        <ClipboardPrompt
+          onEnable={() => void sources.enableClipboard()}
+          onDismiss={sources.dismissPrompt}
+        />
       )}
-      <div id="metrics" aria-live="polite">
-        {metrics.error ? (
-          <div className="metrics-error">Unable to load metrics</div>
-        ) : (
-          <MetricsGrid
-            successRate={metrics.successRate}
-            tabsOpened={metrics.tabsOpened}
-            tabsFailed={metrics.tabsFailed}
-            uptime={metrics.uptime}
-          />
+      <DetailsPanel
+        totals={details.totals}
+        openSince={details.openSince}
+        onRefresh={() => void details.refresh()}
+        onToggle={setDetailsOpen}
+      >
+        {(sources.clipboardPrompt === 'details' ||
+          (sources.clipboardPrompt === 'button' && detailsOpen)) && (
+          <ClipboardPrompt onEnable={() => void sources.enableClipboard()} />
         )}
-      </div>
+      </DetailsPanel>
       <Footer />
-    </>
+    </main>
   );
 }
 
-export function App() {
+/**
+ * Wraps the popup content in the error boundary.
+ * @returns The popup.
+ */
+export function App(): React.JSX.Element {
   return (
     <ErrorBoundary>
       <PopupContent />
