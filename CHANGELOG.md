@@ -60,7 +60,7 @@ All notable changes to OpenList are listed here. The format follows [Keep a Chan
 - The focus ring e2e test now checks the 2 px offset and the accent color of every stop, in light and dark mode.
 - Plan Global Constraint 2 and the Task 15 store-notes step list `clipboardWrite` as an optional permission.
 - Owner choices still open: http versus https (spec 6.1 line 176 against Plan A), and the length of the "Open OpenList once to turn on copying." title. See open items 8 and 9 in docs/project-decisions.md.
-- An earlier `npm exec pnpm@10 --version` wrote `~/.npm/_npx/a1a38f5f0f780954` and a log under `~/.npm/_logs`. Nobody removed them, because they sit outside the project root. The owner decides. Every later npx call uses the cache folder in temp/.
+- An earlier `npm exec pnpm@10 --version` wrote `~/.npm/_npx/a1a38f5f0f780954` and a log under `~/.npm/_logs`, and pnpm wrote `~/Library/Caches/pnpm/metadata-v1.3`. The owner approved the deletion of exactly those paths and the one matching log on 2026-11-17, and they are deleted. Other files in `~/Library/Caches/pnpm` (`lockfile-verified.jsonl`, `v12`) were not part of the approval and stay.
 
 ### Added (end-to-end tests, plan B task 14)
 

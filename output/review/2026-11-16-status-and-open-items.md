@@ -25,7 +25,7 @@ Result: all work in both implementation plans is built, reviewed, and passing th
 3. **Fixed on 2026-11-17** (owner rule: fix every known gap): the round trip for "Title & URL" and "Link" (ruling 33), the toolbar hint time (ruling 36), clipboard site-like lines (ruling 34), the right-click path (ruling 35), and the missing focus, hover, and reduced-motion tests. See docs/project-decisions.md rulings 33 to 37.
 
 6. **The search journal.** The first research agent mis-filed 47 annotation rows. Only the journal's administrator can fix them.
-7. **Outside the project root.** pnpm wrote a cache to ~/Library/Caches/pnpm early on, and the first workflow wrote npm cache paths under ~/.npm. The CHANGELOG lists the two paths. Delete them when you want. Nothing else was written outside the root. The one /tmp file was deleted with your permission.
+7. **Outside the project root (resolved 2026-11-17).** With the owner's permission I deleted `~/.npm/_npx/a1a38f5f0f780954`, `~/Library/Caches/pnpm/metadata-v1.3`, and one npm log. Other files in `~/Library/Caches/pnpm` stay. The one `/tmp` file was deleted earlier.
 8. **Real-Chrome checks no test can prove:** the offscreen clipboard write without focus, whether it needs `clipboardWrite`, and whether the shortcut Alt+Shift+C clashes on your machines.
 
 ## Usage
