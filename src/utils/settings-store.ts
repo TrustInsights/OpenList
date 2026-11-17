@@ -1,7 +1,7 @@
 // Reads and writes the remembered copy format and the clipboard prompt dismissal in chrome.storage.local
 
 import { DEFAULT_FORMAT, type Format, SettingsSchema } from '@/schemas/settings';
-import { z } from 'zod';
+import { z } from '@/schemas/zod';
 
 const SETTINGS_KEY = 'settings';
 

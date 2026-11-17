@@ -12,6 +12,10 @@ Nothing yet.
 
 - `lastError` and `recordError`: write-only (nothing read them), and a Chrome error text can hold a page address, against the promise that the totals never hold a URL (ruling 39). The totals keep three counters. Failed opens still count and show in the popup.
 
+### Fixed (owner bug report)
+
+- Chrome no longer lists a Content Security Policy error for `assets/zod-*.js` on the extension Errors page. Zod now runs with its JIT compiler off, and the policy stays strict. Tests: `tests/e2e/csp.spec.ts` and `tests/unit/schemas/zod.test.ts`.
+
 ### Changed (Chisle review, owner decision 24)
 
 - One parse for Open: `openList` takes an array of final URLs, the message carries `urls: string[]`, and the new `entryUrl` builds the address of a search entry. The second parse of the same text, the one-member `IncomingMessageSchema`, and the `skipped` reply field are gone (ruling 40).

@@ -1,6 +1,6 @@
 // Zod schema and constants for the copy formats, the sources, and the saved settings
 
-import { z } from 'zod';
+import { z } from '@/schemas/zod';
 
 /**
  * The ten copy formats, in menu order.

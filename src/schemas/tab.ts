@@ -1,6 +1,6 @@
 // Zod schema for one tab record used by the copy formats
 
-import { z } from 'zod';
+import { z } from '@/schemas/zod';
 
 /** One tab as the copy formats read it. */
 export const TabRecordSchema = z.object({

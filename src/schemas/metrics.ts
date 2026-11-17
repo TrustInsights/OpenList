@@ -1,6 +1,6 @@
 // Zod schema for the Details totals kept in local storage
 
-import { z } from 'zod';
+import { z } from '@/schemas/zod';
 
 /** Counters only. The totals never hold URLs or titles. */
 export const TotalsSchema = z.object({

@@ -1,6 +1,6 @@
 // Zod schemas for all Chrome runtime messages
 
-import { z } from 'zod';
+import { z } from '@/schemas/zod';
 
 /** Message that asks the background worker to open a list of URLs or search terms. */
 export const OpenListMessageSchema = z.object({

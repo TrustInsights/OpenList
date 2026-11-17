@@ -1,13 +1,11 @@
 // Details totals in local storage and the session start time in session storage
 
 import { DEFAULT_TOTALS, TotalsSchema } from '@/schemas/metrics';
+import { z } from '@/schemas/zod';
 import type { Totals } from '@/types';
-import { z } from 'zod';
 
 const TOTALS_KEY = 'totals';
 const OPEN_SINCE_KEY = 'openSince';
-/** Longest stored error text. It keeps the totals bounded. */
-
 const OpenSinceSchema = z.number().int().min(0);
 
 /** Tail of the write queue. Each totals write waits for the one before it. */
