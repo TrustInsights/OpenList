@@ -18,7 +18,7 @@ let resetTimer: ReturnType<typeof setTimeout> | undefined;
  * Clears the badge and sets the title back to the manifest title. Never rejects.
  * @returns A promise that resolves when the reset ends
  */
-async function resetFeedback(): Promise<void> {
+export async function clearFeedback(): Promise<void> {
   try {
     await Promise.all([
       chrome.action.setBadgeText({ text: '' }),
@@ -31,12 +31,14 @@ async function resetFeedback(): Promise<void> {
 
 /**
  * Shows the result of a copy on the toolbar icon. The badge shows a mark. The title carries the
- * message because a screen reader does not announce a badge. Both clear after 3000 ms.
+ * message because a screen reader does not announce a badge. Both clear after 3000 ms, unless the message is
+ * sticky. A sticky message stays until clearFeedback runs (for example when the user grants a permission).
  * @param message - The result text
  * @param ok - True for success, false for a failure
+ * @param sticky - True to keep the message until clearFeedback runs
  * @returns A promise that resolves when the badge and the title are set
  */
-export async function showResult(message: string, ok: boolean): Promise<void> {
+export async function showResult(message: string, ok: boolean, sticky = false): Promise<void> {
   clearTimeout(resetTimer);
   await Promise.all([
     chrome.action.setBadgeText({ text: ok ? '✓' : '!' }),
@@ -44,7 +46,8 @@ export async function showResult(message: string, ok: boolean): Promise<void> {
     chrome.action.setBadgeTextColor({ color: BADGE_TEXT_COLOR }),
     chrome.action.setTitle({ title: message }),
   ]);
+  if (sticky) return;
   resetTimer = setTimeout(() => {
-    void resetFeedback();
+    void clearFeedback();
   }, FEEDBACK_MS);
 }

@@ -47,7 +47,7 @@ Source of the rulings: output/review/2026-11-16-openlist-review.md, section E, a
 9. Owner choice. Ruling 25 shows the title "Open OpenList once to turn on copying." for 3 seconds. Open item 2 asked for the title to stay until the user grants the permission. Keeping it needs a `chrome.permissions.onAdded` listener that restores the title, and a line in the listener test of `index.ts`.
 10. Done in Task 15 (docs/store-notes.md). Original text: `docs/store-notes.md` must list `clipboardWrite` as an optional permission (write the clipboard from a shortcut), beside `clipboardRead`. The plan Global Constraint now lists both.
 11. Done. Tabs with a blocked or unsupported scheme (`file:`, `view-source:`, `data:`, `javascript:`, `devtools:`) are dropped by `toTabRecord`, so Copy never counts them as search terms and Open never searches for them.
-12. Owner choice. Title & URL (`Title: URL`) and Link (`Title (URL)`) still read back an extra page when the tab title holds an `http://` or `https://` address. A shape rule for them would also cut typed lines such as "Old: https://a.com New: https://b.com" to the last address, which breaks spec 6.1. Options: (A) take only the last address of a line that matches the shape, and accept the loss for typed text, (B) change the two formats so the title cannot hold a bare address, or (C) keep the spec 6.1 rule and amend spec 6.3 to name the exception.
+12. Resolved on 2026-11-17: owner choice B, ruling 33.
 
 ### Open items for Task 14 and docs/accessibility.md (from plan B task 13)
 
@@ -65,6 +65,12 @@ Unit tests cannot prove these. Prove them in the end-to-end specs, in real Chrom
 3. Which window `chrome.windows.getCurrent()` returns in a service worker. The code copies the tabs of that window. Check that it is the window the user works in when the shortcut fires.
 4. The shortcut `Alt+Shift+C` does not clash on macOS and Windows. The user can change it at `chrome://extensions/shortcuts`.
 5. A screen reader reads the title text, because it does not announce a badge. The badge colors pass 4.5:1 (unit test in `tests/unit/background/feedback.test.ts`).
+
+| 33 | Title & URL and Link read back one page (carry-over 12 resolved, owner choice B, 2026-11-17) | `lineEntries` in `src/utils/extract-urls.ts` takes only the last address of a line that ends in the Copy shape: `Title: URL` or `Title (URL)`. A title that holds an address no longer adds a page. | Spec 6.3 now holds for all nine formats that carry URLs. A typed line with two labelled addresses, such as "Old: https://a.com New: https://b.com", keeps only the last address. This loss is accepted. A line of several addresses with no label keeps every address (spec 6.1). Tests: `tests/unit/utils/extract-urls-shapes.test.ts`, `formatters-escaping.test.ts` (all nine formats). |
+| 34 | Clipboard detection counts explicit web addresses only | `readClipboardUrls` uses `webAddresses`, which finds `http://` and `https://` addresses and ignores site-like text such as `example.com` or `node.js`. | Spec 7 says two or more http or https addresses. A copied sentence that names a site must not fill the list. |
+| 35 | The right-click path follows the popup rules | `openSelection` (`src/background/open-selection.ts`) reads the selection with `parseList`, skips pages already open in the window of the click, removes repeats, opens at most 20, and shows the result on the toolbar icon. | Before, a selected line with an address among words became a Google search, nothing removed repeats, and open pages were opened again. Tests: `tests/unit/background/open-selection.test.ts`. |
+| 36 | The permission hint stays (open item 9 resolved) | "Open OpenList once to turn on copying." stays on the toolbar title until the user grants the permissions. A `chrome.permissions.onAdded` listener clears it. Other results clear after 3 seconds. | A hint that vanishes after 3 seconds is easy to miss and leaves the user with a silent shortcut. Tests: `feedback.test.ts`, `copy-window.test.ts`, `index.test.ts`. |
+| 37 | ES module project files | `package.json` has `"type": "module"`. The configs use `import.meta.dirname`. | Vite warned that `vite.config.ts` and `vitest.config.ts` used ESM syntax in a CommonJS package. A later Vite major version would make this an error. The file names stay as the Chrome rules require. |
 
 ## Ruling 12: search index (final)
 

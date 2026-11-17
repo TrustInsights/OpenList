@@ -25,6 +25,13 @@ const ADDRESS = /https?:\/\/[^\s<>"'[\]]+/gi;
 const COPY_ITEM =
   /^- \[(?:\\.|[^\\\]])*\]\((https?:\/\/\S+)\)$|^\[url=(https?:\/\/[^\]\s]+)\][^[\]]*\[\/url\]$/i;
 
+/**
+ * The Title & URL item ("Title: URL") and the Link item ("Title (URL)") that Copy writes. The address is the last
+ * thing on the line, so a title that holds an address gives no second page. Group 1 is the Title & URL target.
+ * Group 2 is the Link target. A line that does not end this way keeps the rule "every address on the line".
+ */
+const TITLE_ITEM = /^.*: (https?:\/\/\S+)$|^.* \((https?:\/\/.+)\)$/i;
+
 /** Punctuation that ends a sentence and does not belong to an address. */
 const TRAILING_PUNCTUATION = /[.,;:!?]$/;
 
@@ -86,7 +93,7 @@ function trimAddress(raw: string): string {
 }
 
 /**
- * Reads one non-empty line: a Markdown or BBCode item of Copy, addresses, a site, or a search term.
+ * Reads one non-empty line: an item of Copy (Markdown, BBCode, Title & URL, Link), addresses, a site, or a search term.
  * @param line - The trimmed line text.
  * @param index - The zero-based line number.
  * @returns The entries of the line, before repeats are removed.
@@ -94,6 +101,8 @@ function trimAddress(raw: string): string {
 export function lineEntries(line: string, index: number): Entry[] {
   const item = COPY_ITEM.exec(line);
   if (item !== null) return urlEntry(item[1] ?? item[2], index);
+  const titled = TITLE_ITEM.exec(line);
+  if (titled !== null) return urlEntry(trimAddress(titled[1] ?? titled[2]), index);
   const addresses = [...line.matchAll(ADDRESS)];
   if (addresses.length > 0) {
     return addresses.flatMap((match) => urlEntry(trimAddress(match[0]), index));
@@ -143,6 +152,23 @@ function build(groups: Entry[][], structured: boolean): ParsedList {
     )
     .filter((group) => group.length > 0);
   return { entries: unique.flat(), groups: unique, structured };
+}
+
+/**
+ * Finds the explicit http and https addresses in a text. A site such as example.com does not count.
+ * @param text - Any text, for example the clipboard text.
+ * @returns The unique addresses, upgraded and cleaned as the list does it, in order.
+ */
+export function webAddresses(text: string): string[] {
+  const seen = new Set<string>();
+  const found: string[] = [];
+  for (const match of text.matchAll(ADDRESS)) {
+    const entry = urlEntry(trimAddress(match[0]), -1)[0];
+    if (entry === undefined || entry.kind !== 'url' || seen.has(urlKey(entry.url))) continue;
+    seen.add(urlKey(entry.url));
+    found.push(entry.url);
+  }
+  return found;
 }
 
 /**

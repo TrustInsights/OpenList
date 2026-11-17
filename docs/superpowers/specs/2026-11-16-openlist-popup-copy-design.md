@@ -172,7 +172,7 @@ The extractor looks at the structure of the whole text first. Then it falls back
 1. If the text parses as JSON, take the `url` value of each object.
 2. If the first line is the CSV header that Copy writes (`title,url,window,index,pinned,active`), take the URL column.
 3. If the text starts with `<` (HTML), take the `href` values.
-4. Otherwise read each line on its own:
+4. Otherwise read each line on its own. A line that ends in the Copy shape "Title: URL" or "Title (URL)" gives only its last address, so a title that holds an address adds no page (owner choice B, 2026-11-17; a typed line with two labelled addresses keeps only the last):
    - A line with one or more `http://` or `https://` addresses gives those addresses, in order. This covers Markdown, BBCode, Title & URL, Link, and plain URLs. An `http://` address of a website becomes `https://`. An `http://` address of a local host stays `http://` as typed. Local hosts are `localhost`, `127.0.0.1`, `[::1]`, and any host that ends in `.local`. (Owner decision 17.)
    - A line that looks like a site (`www.example.com`, `example.com`, `news.ycombinator.com/item`) becomes an `https://` URL.
    - Any other line becomes a Google search. This is the original behavior and the README promise.
@@ -216,7 +216,7 @@ A line of search words becomes a Google search when Open runs, and the Open coun
 - The permission `clipboardRead` is optional (decision D12, owner choice B). The popup checks `chrome.permissions.contains` when it opens.
 - If the permission is not granted, the popup shows one button, "Turn on clipboard detection", under the status line. It is a real button with a visible label. A click calls `chrome.permissions.request`, which needs a user gesture. If the permission prompt closes the popup, the next open uses the clipboard at once. After one dismissal the button moves into Details so it never nags. (The exact wording and placement are the builder's.)
 - If the permission is granted, the popup reads the clipboard text once when it opens.
-- If the text holds two or more `http://` or `https://` addresses, "Clipboard (N URLs)" is added to the "From" control and becomes the default (after "Selected tabs", see section 5.1). The status line says "Using 5 URLs from your clipboard."
+- If the text holds two or more `http://` or `https://` addresses (site-like text such as example.com does not count), "Clipboard (N URLs)" is added to the "From" control and becomes the default (after "Selected tabs", see section 5.1). The status line says "Using 5 URLs from your clipboard."
 - Otherwise the text is dropped at once. A read that fails or is denied is ignored with no message.
 - The clipboard is read only when the popup opens. The shortcut and the toolbar menu in section 8 never read it.
 - Test in Chrome: whether the permission prompt closes the popup (section 14).

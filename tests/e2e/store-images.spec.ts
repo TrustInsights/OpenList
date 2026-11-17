@@ -7,7 +7,7 @@ import path from 'node:path';
 import { chromium, expect, test } from '@playwright/test';
 import { type Shot, pngInfo, popupPicture, renderImage } from '@tests/helpers/store-image-compose';
 
-const ROOT = path.join(__dirname, '../..');
+const ROOT = path.join(import.meta.dirname, '../..');
 const DIST = path.join(ROOT, 'dist');
 const OUT = path.join(ROOT, 'output/store-images');
 const PROFILE_ROOT = path.join(ROOT, 'temp/store-image-profiles');

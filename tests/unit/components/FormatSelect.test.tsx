@@ -59,4 +59,18 @@ describe('FormatSelect', () => {
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'bogus' } });
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  it('keeps the focus on the control after a format change (spec 5.5)', async () => {
+    const onChange = vi.fn();
+    render(
+      <>
+        <FormatSelect value="URL" onChange={onChange} example="" />
+        <button type="button">Other</button>
+      </>
+    );
+    const select = screen.getByRole('combobox');
+    await userEvent.setup().selectOptions(select, 'Markdown');
+    expect(onChange).toHaveBeenCalledOnce();
+    expect(document.activeElement).toBe(select);
+  });
 });

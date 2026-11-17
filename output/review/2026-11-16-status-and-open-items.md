@@ -22,12 +22,8 @@ Result: all work in both implementation plans is built, reviewed, and passing th
 
 1. **Approve commits.** Say when to commit. Do not push until you say so.
 2. **Manual accessibility pass.** An agent cannot do these. They are marked NOT DONE or UNVERIFIED in docs/accessibility.md: VoiceOver, real Windows forced colors, real browser zoom, the real optional-permission prompt for clipboard detection, `selectionText` newlines, and which window `getCurrent()` returns in the service worker. Until then the extension must not be called WCAG 2.1 AA compliant.
-3. **Round trip for two formats (carry-over 12).** "Title & URL" and "Link" read back an extra page when a tab title itself contains an http or https address. Spec 6.3 fails for those two formats. Fixing it with a shape rule would break typed lines such as "Old: https://a.com New: https://b.com". The options are in docs/project-decisions.md.
-4. **Open item 9.** The toolbar title shows the result for 3 seconds. Keeping it until the permission is granted needs a permission listener. Your choice.
-5. **Smaller gaps from the final audit:**
-   - Clipboard detection counts site-like lines (such as "example.com") as URLs. The spec says only http or https addresses. A test makes this deliberate, but no ruling covers it.
-   - The right-click "Open selected URLs" path does not use the new parser, does not remove duplicates, and does not skip tabs that are already open.
-   - "A format change never moves focus" has an end-to-end test but no unit test. The "fine pointer" and "reduced motion" rules exist in CSS but have no test.
+3. **Fixed on 2026-11-17** (owner rule: fix every known gap): the round trip for "Title & URL" and "Link" (ruling 33), the toolbar hint time (ruling 36), clipboard site-like lines (ruling 34), the right-click path (ruling 35), and the missing focus, hover, and reduced-motion tests. See docs/project-decisions.md rulings 33 to 37.
+
 6. **The search journal.** The first research agent mis-filed 47 annotation rows. Only the journal's administrator can fix them.
 7. **Outside the project root.** pnpm wrote a cache to ~/Library/Caches/pnpm early on, and the first workflow wrote npm cache paths under ~/.npm. The CHANGELOG lists the two paths. Delete them when you want. Nothing else was written outside the root. The one /tmp file was deleted with your permission.
 8. **Real-Chrome checks no test can prove:** the offscreen clipboard write without focus, whether it needs `clipboardWrite`, and whether the shortcut Alt+Shift+C clashes on your machines.

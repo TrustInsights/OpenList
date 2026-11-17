@@ -1,6 +1,6 @@
 // Clipboard helpers: optional read permission, read of URLs, and plain or rich writes
 
-import { parseList } from '@/utils/extract-urls';
+import { webAddresses } from '@/utils/extract-urls';
 import type { ClipboardPayload } from '@/utils/formatters';
 
 /**
@@ -39,9 +39,7 @@ export async function readClipboardUrls(): Promise<string[] | null> {
     if (!(await hasClipboardPermission())) return null;
     const text = await navigator.clipboard.readText();
     if (text.length > MAX_READ_LENGTH) return null;
-    return parseList(text)
-      .entries.flatMap((entry) => (entry.kind === 'url' ? [entry.url] : []))
-      .filter((url) => url.startsWith('http'));
+    return webAddresses(text);
   } catch {
     return null;
   }

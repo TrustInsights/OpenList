@@ -98,11 +98,7 @@ describe('formatTabs: round trip', () => {
     expect(parsed.entries).toHaveLength(3);
   });
 
-  // Title & URL and Link have no unique shape: "A: https://a.com B: https://b.com" is also typed text.
-  // Those two formats wait for an owner ruling (docs/project-decisions.md, open item on titles with addresses).
-  const shaped = carriers.filter((format) => format !== 'Title & URL' && format !== 'Link');
-
-  it.each(shaped)('%s keeps only the tab URL when the title holds an address', (format) => {
+  it.each(carriers)('%s keeps only the tab URL when the title holds an address', (format) => {
     const hostile = { ...t, title: 'See https://evil.example/x [y] for more' };
     const entries = parseList(textOf(format, hostile)).entries;
     expect(entries.map((entry) => (entry.kind === 'url' ? urlKey(entry.url) : entry.term))).toEqual(

@@ -4,6 +4,15 @@ All notable changes to OpenList are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+### Fixed (2026-11-17, owner rule: fix every known gap)
+
+- Round trip: "Title & URL" and "Link" lines now read back one page even when a tab title holds an address (ruling 33). Spec 6.3 holds for all nine formats that carry URLs.
+- Clipboard detection counts only `http://` and `https://` addresses, not site-like text (ruling 34).
+- Right-click "Open selected URLs": reads the selection like the popup, skips pages already open, removes repeats, opens at most 20, and shows the result on the toolbar icon (ruling 35).
+- The toolbar hint "Open OpenList once to turn on copying." stays until the permissions are granted (ruling 36).
+- `package.json` has `"type": "module"`, and the configs use `import.meta.dirname`. The Vite warning about ESM syntax in a CommonJS package is gone (ruling 37).
+- Tests added: focus stays on the format control after a change, hover moves a control only for a fine pointer, reduced motion removes transitions and movement, and the service worker entry point registers every listener.
+
 ### Added (distribution, 2026-11-17)
 
 - `pnpm package` builds the extension and writes `output/artifacts/openlist-<version>.zip` through `src/tools/package-release.sh`. The tool checks the manifest version against `package.json`, the service worker file, and the zip layout. Tests: `tests/unit/tools/package-release.test.ts`.

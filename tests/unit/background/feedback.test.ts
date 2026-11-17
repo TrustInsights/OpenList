@@ -1,6 +1,6 @@
 // Unit tests for background/feedback.ts
 
-import { showResult } from '@/background/feedback';
+import { clearFeedback, showResult } from '@/background/feedback';
 import { logger } from '@/utils/logger';
 import { contrastRatio } from '@tests/helpers/contrast';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -24,6 +24,23 @@ describe('showResult', () => {
     expect(chrome.action.setBadgeBackgroundColor).toHaveBeenCalledWith({ color: '#0b57d0' });
     expect(chrome.action.setBadgeTextColor).toHaveBeenCalledWith({ color: '#ffffff' });
     expect(chrome.action.setTitle).toHaveBeenCalledWith({ title: 'Copied 3 as Markdown.' });
+  });
+
+  it('keeps a sticky message after 3000 ms and clears it when clearFeedback runs', async () => {
+    await showResult('Open OpenList once to turn on copying.', false, true);
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(chrome.action.setBadgeText).not.toHaveBeenCalledWith({ text: '' });
+
+    await clearFeedback();
+    expect(chrome.action.setBadgeText).toHaveBeenCalledWith({ text: '' });
+    expect(chrome.action.setTitle).toHaveBeenLastCalledWith({ title: DEFAULT_TITLE });
+  });
+
+  it('cancels the timer of an earlier message when a sticky message follows', async () => {
+    await showResult('Copied 3 as URL.', true);
+    await showResult('Open OpenList once to turn on copying.', false, true);
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(chrome.action.setBadgeText).not.toHaveBeenCalledWith({ text: '' });
   });
 
   it('sets an exclamation mark on the error color for a failure', async () => {

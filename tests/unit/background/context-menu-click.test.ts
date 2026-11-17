@@ -37,7 +37,7 @@ describe('handleContextMenuClick', () => {
   it('opens the selection and records no error on success', async () => {
     await handleContextMenuClick(CLICK);
 
-    expect(openListSpy).toHaveBeenCalledWith('https://example.com');
+    expect(openListSpy).toHaveBeenCalledWith('https://example.com/');
     expect(recordErrorSpy).not.toHaveBeenCalled();
   });
 

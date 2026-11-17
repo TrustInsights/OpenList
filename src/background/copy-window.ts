@@ -95,7 +95,7 @@ export async function copyWindowTabs(): Promise<void> {
     logger.error('Copy of this window failed', { error: message });
   }
   try {
-    await showResult(message, ok);
+    await showResult(message, ok, message === NEEDS_PERMISSION);
   } catch (err) {
     logger.error('Feedback failed', { error: toErrorMessage(err) });
   }

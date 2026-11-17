@@ -78,6 +78,11 @@ describe('readClipboardUrls', () => {
     expect(await readClipboardUrls()).toEqual(['https://a.com/']);
   });
 
+  it('does not count a site-like line as a web address (spec 7: http and https only)', async () => {
+    readText.mockResolvedValue('example.com\nnode.js\nhttps://a.com\nhttps://b.com');
+    expect(await readClipboardUrls()).toEqual(['https://a.com/', 'https://b.com/']);
+  });
+
   it('keeps http for a local address', async () => {
     readText.mockResolvedValue('http://localhost:3000/a\nhttp://a.com');
     expect(await readClipboardUrls()).toEqual(['http://localhost:3000/a', 'https://a.com/']);

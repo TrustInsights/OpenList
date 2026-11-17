@@ -2,6 +2,7 @@
   "name": "openlist",
   "version": "1.2.0",
   "private": true,
+  "type": "module",
   "description": "Manage and open lists of URLs in new tabs",
   "scripts": {
     "dev": "vite",

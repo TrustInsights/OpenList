@@ -81,6 +81,18 @@ describe('copyWindowTabs', () => {
     expect(chrome.action.setBadgeText).toHaveBeenCalledWith({ text: '!' });
   });
 
+  it('keeps the permission hint on the toolbar until the permissions are granted', async () => {
+    vi.useFakeTimers();
+    try {
+      (chrome.permissions.contains as ReturnType<typeof vi.fn>).mockResolvedValue(false);
+      await copyWindowTabs();
+      await vi.advanceTimersByTimeAsync(10_000);
+      expect(chrome.action.setBadgeText).not.toHaveBeenCalledWith({ text: '' });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('uses the first-run format URL when nothing is remembered', async () => {
     await copyWindowTabs();
 

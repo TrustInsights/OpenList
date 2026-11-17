@@ -59,6 +59,7 @@ const makeRemoveAllMock = (): Mock<(cb?: () => void) => void> =>
   });
 
 const mockPermissions = {
+  onAdded: { addListener: vi.fn() },
   contains: vi.fn().mockResolvedValue(false),
   request: vi.fn().mockResolvedValue(false),
 };

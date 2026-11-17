@@ -12,8 +12,8 @@ import {
   chromium,
 } from '@playwright/test';
 
-const EXTENSION_PATH = path.join(__dirname, '../../dist');
-const PROFILE_ROOT = path.join(__dirname, '../../temp/e2e-profiles');
+const EXTENSION_PATH = path.join(import.meta.dirname, '../../dist');
+const PROFILE_ROOT = path.join(import.meta.dirname, '../../temp/e2e-profiles');
 
 /** The local site that serves the test pages. */
 interface Site {
