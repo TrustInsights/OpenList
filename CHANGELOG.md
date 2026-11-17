@@ -4,6 +4,11 @@ All notable changes to OpenList are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+### Added (distribution, 2026-11-17)
+
+- `pnpm package` builds the extension and writes `output/artifacts/openlist-<version>.zip` through `src/tools/package-release.sh`. The tool checks the manifest version against `package.json`, the service worker file, and the zip layout. Tests: `tests/unit/tools/package-release.test.ts`.
+- `docs/privacy-policy.md`, `docs/store-listing.md` (draft), and `docs/release-checklist.md`.
+
 ### Fixed (substance audit, 2026-11-16)
 
 - Round trip (spec 6.3): a Markdown or BBCode item whose tab title holds a web address read back as two pages. `lineEntries` now takes only the link target of the exact item shapes that Copy writes (ruling 32). Title & URL and Link stay open as carry-over 12 in docs/project-decisions.md.
