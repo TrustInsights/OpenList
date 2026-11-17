@@ -7,7 +7,6 @@ import { z } from 'zod';
 const TOTALS_KEY = 'totals';
 const OPEN_SINCE_KEY = 'openSince';
 /** Longest stored error text. It keeps the totals bounded. */
-const MAX_ERROR_LENGTH = 300;
 
 const OpenSinceSchema = z.number().int().min(0);
 
@@ -57,20 +56,6 @@ export function addTotals(
         tabsFailed: totals.tabsFailed + (delta.tabsFailed ?? 0),
         urlsProcessed: totals.urlsProcessed + (delta.urlsProcessed ?? 0),
       },
-    });
-  });
-}
-
-/**
- * Records the last error message in the totals. Long messages are cut to 300 characters.
- * @param message - Error message to record
- * @returns A promise that resolves when the error message is saved
- */
-export function recordError(message: string): Promise<void> {
-  return enqueue(async () => {
-    const totals = await getTotals();
-    await chrome.storage.local.set({
-      [TOTALS_KEY]: { ...totals, lastError: message.slice(0, MAX_ERROR_LENGTH) },
     });
   });
 }

@@ -5,7 +5,6 @@ import { openSelection } from '@/background/open-selection';
 import { CONFIG } from '@/schemas/config';
 import { toErrorMessage } from '@/utils/errors';
 import { logger } from '@/utils/logger';
-import { recordError } from '@/utils/metrics-store';
 import { sleep } from '@/utils/tabs';
 
 /** The item on selected text: open the URLs in the selection. */
@@ -91,7 +90,7 @@ export async function initializeContextMenu(): Promise<void> {
 
 /**
  * Handles a click on a context menu item. The toolbar item copies this window's tabs.
- * The selection item opens the selected URLs and records any failure in the metrics. Never rejects.
+ * The selection item opens the selected URLs and logs any failure. Never rejects.
  * @param info - The click data that Chrome passes to the listener
  * @param tab - The tab where the click happened, when Chrome gives it
  * @returns A promise that resolves when the click is handled
@@ -111,12 +110,6 @@ export async function handleContextMenuClick(
     await openSelection(info.selectionText, tab?.windowId);
     logger.info('Context menu selection processed');
   } catch (err) {
-    const msg = toErrorMessage(err);
-    logger.error('Context menu click handler error', { error: msg });
-    try {
-      await recordError(`Context menu click failed: ${msg}`);
-    } catch (recordErr) {
-      logger.error('Error record failed', { error: toErrorMessage(recordErr) });
-    }
+    logger.error('Context menu click handler error', { error: toErrorMessage(err) });
   }
 }

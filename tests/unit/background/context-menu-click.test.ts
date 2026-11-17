@@ -4,7 +4,7 @@ import { handleContextMenuClick } from '@/background/context-menu';
 import * as copyWindowModule from '@/background/copy-window';
 import * as openListModule from '@/background/open-list';
 import { CONFIG } from '@/schemas/config';
-import * as metricsModule from '@/utils/metrics-store';
+import * as loggerModule from '@/utils/logger';
 import { type MockInstance, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const CLICK = {
@@ -16,7 +16,6 @@ const CLICK = {
 
 describe('handleContextMenuClick', () => {
   let openListSpy: MockInstance<typeof openListModule.openList>;
-  let recordErrorSpy: MockInstance<typeof metricsModule.recordError>;
 
   beforeEach(() => {
     openListSpy = vi.spyOn(openListModule, 'openList').mockResolvedValue({
@@ -27,7 +26,6 @@ describe('handleContextMenuClick', () => {
       errors: [],
       opened: [],
     });
-    recordErrorSpy = vi.spyOn(metricsModule, 'recordError').mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -38,7 +36,6 @@ describe('handleContextMenuClick', () => {
     await handleContextMenuClick(CLICK);
 
     expect(openListSpy).toHaveBeenCalledWith('https://example.com/');
-    expect(recordErrorSpy).not.toHaveBeenCalled();
   });
 
   it("copies this window's tabs on a click on the toolbar item, with no selection", async () => {
@@ -74,23 +71,12 @@ describe('handleContextMenuClick', () => {
     expect(openListSpy).not.toHaveBeenCalled();
   });
 
-  it('records one error when openList rejects', async () => {
+  it('logs one error and resolves when openList rejects', async () => {
     openListSpy.mockRejectedValue(new Error('tabs gone'));
-
-    await handleContextMenuClick(CLICK);
-
-    expect(recordErrorSpy).toHaveBeenCalledOnce();
-    const message = recordErrorSpy.mock.calls[0][0];
-    expect(message).toContain('Context menu click failed');
-    expect(message).toContain('tabs gone');
-  });
-
-  it('still resolves when recordError also rejects', async () => {
-    openListSpy.mockRejectedValue(new Error('tabs gone'));
-    recordErrorSpy.mockRejectedValue(new Error('storage gone'));
+    const error = vi.spyOn(loggerModule.logger, 'error').mockImplementation(() => undefined);
 
     await expect(handleContextMenuClick(CLICK)).resolves.toBeUndefined();
 
-    expect(recordErrorSpy).toHaveBeenCalledOnce();
+    expect(error).toHaveBeenCalledWith('Context menu click handler error', { error: 'tabs gone' });
   });
 });

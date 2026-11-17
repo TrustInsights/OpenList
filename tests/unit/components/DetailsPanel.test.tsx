@@ -6,7 +6,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe } from 'vitest-axe';
 
-const TOTALS: Totals = { tabsOpened: 5, tabsFailed: 1, urlsProcessed: 6, lastError: null };
+const TOTALS: Totals = { tabsOpened: 5, tabsFailed: 1, urlsProcessed: 6 };
 
 /** The Open since time of 16 Nov 2026, 09:41 in the local time zone. */
 const OPEN_SINCE = new Date(2026, 10, 16, 9, 41).getTime();

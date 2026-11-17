@@ -5,7 +5,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { useFakeStorage } from '@tests/helpers/chrome-storage';
 import { describe, expect, it, vi } from 'vitest';
 
-const TOTALS = { tabsOpened: 8, tabsFailed: 2, urlsProcessed: 10, lastError: null };
+const TOTALS = { tabsOpened: 8, tabsFailed: 2, urlsProcessed: 10 };
 
 describe('useDetails', () => {
   it('starts with zero totals and no session start', () => {
@@ -15,7 +15,6 @@ describe('useDetails', () => {
       tabsOpened: 0,
       tabsFailed: 0,
       urlsProcessed: 0,
-      lastError: null,
     });
     expect(result.current.openSince).toBe(0);
   });

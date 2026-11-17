@@ -4,7 +4,7 @@ import { CONFIG } from '@/schemas/config';
 import type { OpenListResult } from '@/types';
 import { toErrorMessage } from '@/utils/errors';
 import { logger } from '@/utils/logger';
-import { addTotals, recordError } from '@/utils/metrics-store';
+import { addTotals } from '@/utils/metrics-store';
 import { createTab, sleep } from '@/utils/tabs';
 import { isProbablyUrl, sanitizeUrl } from '@/utils/urls';
 
@@ -64,11 +64,6 @@ export async function openList(list: string): Promise<OpenListResult> {
       const msg = toErrorMessage(err);
       results.errors.push(`Failed to open ${trimmed}: ${msg}`);
       logger.error('Tab creation failed', { url: trimmed, error: msg });
-      try {
-        await recordError(`Failed to open a tab: ${msg}`);
-      } catch (recordErr) {
-        logger.error('Error record failed', { error: toErrorMessage(recordErr) });
-      }
     }
   }
 

@@ -34,12 +34,12 @@ afterEach(() => {
 
 describe('App Details', () => {
   it('shows the totals and the Refresh button reads them again', async () => {
-    storage.local.totals = { tabsOpened: 5, tabsFailed: 1, urlsProcessed: 6, lastError: null };
+    storage.local.totals = { tabsOpened: 5, tabsFailed: 1, urlsProcessed: 6 };
     storage.session.openSince = new Date(2026, 10, 16, 9, 41).getTime();
     await loadedApp();
     const rate = screen.getByText('Success rate', { selector: 'dt' }).parentElement;
     await waitFor(() => expect(rate).toHaveTextContent('83.3%'));
-    storage.local.totals = { tabsOpened: 6, tabsFailed: 1, urlsProcessed: 6, lastError: null };
+    storage.local.totals = { tabsOpened: 6, tabsFailed: 1, urlsProcessed: 6 };
     const refresh = screen.getByRole('button', { name: 'Refresh', hidden: true });
     await user.click(refresh);
     await waitFor(() => expect(rate).toHaveTextContent('100%'));

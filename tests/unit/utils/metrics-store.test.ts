@@ -2,28 +2,22 @@
 
 import { openList } from '@/background/open-list';
 import * as store from '@/utils/metrics-store';
-import {
-  addTotals,
-  getOpenSince,
-  getTotals,
-  markSessionStart,
-  recordError,
-} from '@/utils/metrics-store';
+import { addTotals, getOpenSince, getTotals, markSessionStart } from '@/utils/metrics-store';
 import * as tabsModule from '@/utils/tabs';
 import { useFakeStorage } from '@tests/helpers/chrome-storage';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const ZEROS = { tabsOpened: 0, tabsFailed: 0, urlsProcessed: 0, lastError: null };
+const ZEROS = { tabsOpened: 0, tabsFailed: 0, urlsProcessed: 0 };
 
 describe('getTotals', () => {
-  it('returns zeros and no error when storage is empty', async () => {
+  it('returns zeros when storage is empty', async () => {
     useFakeStorage();
     expect(await getTotals()).toEqual(ZEROS);
   });
 
   it('returns the stored totals when they are valid', async () => {
     const fake = useFakeStorage();
-    const stored = { tabsOpened: 5, tabsFailed: 1, urlsProcessed: 6, lastError: 'some error' };
+    const stored = { tabsOpened: 5, tabsFailed: 1, urlsProcessed: 6 };
     fake.local.totals = stored;
     expect(await getTotals()).toEqual(stored);
   });
@@ -55,15 +49,14 @@ describe('addTotals', () => {
     expect(await getOpenSince()).toBe(0);
   });
 
-  it('uses 0 for omitted fields and keeps the last error', async () => {
+  it('uses 0 for omitted fields', async () => {
     const fake = useFakeStorage();
-    fake.local.totals = { tabsOpened: 10, tabsFailed: 2, urlsProcessed: 12, lastError: 'old' };
+    fake.local.totals = { tabsOpened: 10, tabsFailed: 2, urlsProcessed: 12 };
     await addTotals({ tabsOpened: 5 });
     expect(fake.local.totals).toEqual({
       tabsOpened: 15,
       tabsFailed: 2,
       urlsProcessed: 12,
-      lastError: 'old',
     });
   });
 
@@ -88,19 +81,17 @@ describe('addTotals', () => {
     expect(fake.local.totals).toEqual({ ...ZEROS, tabsOpened: 3 });
   });
 
-  it('keeps every count when increments, errors, and session starts run at once', async () => {
+  it('keeps every count when increments and session starts run at once', async () => {
     const fake = useFakeStorage();
     await Promise.all([
       markSessionStart(5000),
       addTotals({ tabsOpened: 2, tabsFailed: 1, urlsProcessed: 2 }),
-      recordError('boom'),
       addTotals({ tabsOpened: 1, urlsProcessed: 1 }),
     ]);
     expect(fake.local.totals).toEqual({
       tabsOpened: 3,
       tabsFailed: 1,
       urlsProcessed: 3,
-      lastError: 'boom',
     });
     expect(fake.session.openSince).toBe(5000);
   });
@@ -112,26 +103,6 @@ describe('addTotals', () => {
     await expect(first).rejects.toThrow('quota');
     await second;
     expect(fake.local.totals).toEqual({ ...ZEROS, tabsOpened: 2 });
-  });
-});
-
-describe('recordError', () => {
-  it('sets lastError and keeps the counters', async () => {
-    const fake = useFakeStorage();
-    await addTotals({ tabsOpened: 2, urlsProcessed: 2 });
-    await recordError('something broke');
-    expect(fake.local.totals).toEqual({
-      tabsOpened: 2,
-      tabsFailed: 0,
-      urlsProcessed: 2,
-      lastError: 'something broke',
-    });
-  });
-
-  it('cuts a very long message to 300 characters so the totals stay bounded', async () => {
-    const fake = useFakeStorage();
-    await recordError('x'.repeat(5000));
-    expect((fake.local.totals as { lastError: string }).lastError).toBe('x'.repeat(300));
   });
 });
 
@@ -185,19 +156,16 @@ describe('stored keys and exports', () => {
       tabsOpened: 0,
       tabsFailed: 2,
       urlsProcessed: 2,
-      lastError: 'Failed to open a tab: tab creation error',
     });
     const stored = JSON.stringify(fake.local);
     expect(stored).not.toContain('secret.example');
     expect(stored).not.toContain('best pizza');
   });
 
-  it('Totals never hold URLs: the stored object has exactly the four counter keys', async () => {
+  it('Totals never hold URLs: the stored object has exactly the three counter keys', async () => {
     const fake = useFakeStorage();
     await addTotals({ tabsOpened: 1, tabsFailed: 1, urlsProcessed: 2 });
-    await recordError('Failed to open one tab');
     expect(Object.keys(fake.local.totals as object).sort()).toEqual([
-      'lastError',
       'tabsFailed',
       'tabsOpened',
       'urlsProcessed',
@@ -207,7 +175,6 @@ describe('stored keys and exports', () => {
   it('writes no serviceWorkerState or metrics key to either area', async () => {
     const fake = useFakeStorage();
     await addTotals({ tabsOpened: 1 });
-    await recordError('e');
     await markSessionStart(1);
     expect(Object.keys(fake.local)).toEqual(['totals']);
     expect(Object.keys(fake.session)).toEqual(['openSince']);

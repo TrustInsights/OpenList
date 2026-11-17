@@ -16,7 +16,6 @@ describe('openList', () => {
     } as chrome.tabs.Tab);
     // Stub metric calls to avoid storage side effects
     vi.spyOn(metricsModule, 'addTotals').mockResolvedValue(undefined);
-    vi.spyOn(metricsModule, 'recordError').mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -166,38 +165,6 @@ describe('openList', () => {
     expect(result.successful).toBe(0);
     expect(result.errors).toHaveLength(1);
     expect(result.errors[0]).toContain('tab creation error');
-  });
-
-  it('createTab failure → records one error that holds no URL', async () => {
-    (tabsModule.createTab as ReturnType<typeof vi.fn>).mockRejectedValue(
-      new Error('tab creation error')
-    );
-
-    const promise = openList('https://example.com');
-    await vi.runAllTimersAsync();
-    await promise;
-
-    expect(metricsModule.recordError).toHaveBeenCalledTimes(1);
-    expect(metricsModule.recordError).toHaveBeenCalledWith(
-      'Failed to open a tab: tab creation error'
-    );
-    expect((metricsModule.recordError as ReturnType<typeof vi.fn>).mock.calls[0][0]).not.toContain(
-      'example.com'
-    );
-  });
-
-  it('recordError rejection → openList still returns its result', async () => {
-    (tabsModule.createTab as ReturnType<typeof vi.fn>).mockRejectedValue(
-      new Error('tab creation error')
-    );
-    vi.spyOn(metricsModule, 'recordError').mockRejectedValue(new Error('storage down'));
-
-    const promise = openList('https://example.com');
-    await vi.runAllTimersAsync();
-    const result = await promise;
-
-    expect(result.failed).toBe(1);
-    expect(metricsModule.addTotals).toHaveBeenCalledTimes(1);
   });
 
   it('updates metrics in storage (batched at end)', async () => {

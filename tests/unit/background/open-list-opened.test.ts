@@ -10,7 +10,6 @@ describe('openList opened', () => {
     vi.useFakeTimers();
     vi.spyOn(tabsModule, 'createTab').mockResolvedValue({ id: 1 } as chrome.tabs.Tab);
     vi.spyOn(metricsModule, 'addTotals').mockResolvedValue(undefined);
-    vi.spyOn(metricsModule, 'recordError').mockResolvedValue(undefined);
   });
 
   afterEach(() => {

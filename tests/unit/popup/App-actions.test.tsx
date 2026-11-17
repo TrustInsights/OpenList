@@ -104,13 +104,13 @@ describe('App copy and format', () => {
 
 describe('App open', () => {
   it('opens the new URLs, removes them, reports, and reads Details again', async () => {
-    storage.local.totals = { tabsOpened: 1, tabsFailed: 0, urlsProcessed: 1, lastError: null };
+    storage.local.totals = { tabsOpened: 1, tabsFailed: 0, urlsProcessed: 1 };
     await loadedApp(THREE, [THREE[0].url as string]);
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Open 2 URLs' })).toBeInTheDocument()
     );
     send.mockResolvedValue(reply(['https://site2.com/', 'https://site3.com/']));
-    storage.local.totals = { tabsOpened: 3, tabsFailed: 0, urlsProcessed: 3, lastError: null };
+    storage.local.totals = { tabsOpened: 3, tabsFailed: 0, urlsProcessed: 3 };
     await user.click(screen.getByRole('button', { name: 'Open 2 URLs' }));
     expect(send).toHaveBeenCalledWith({
       action: 'openList',

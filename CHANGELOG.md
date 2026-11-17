@@ -8,6 +8,10 @@ Nothing yet.
 
 ## [1.2.0] - 2026-11-17
 
+### Removed (Chisle review, 2026-11-17)
+
+- `lastError` and `recordError`: write-only (nothing read them), and a Chrome error text can hold a page address, against the promise that the totals never hold a URL (ruling 39). The totals keep three counters. Failed opens still count and show in the popup.
+
 ### Changed (owner decision 23, 2026-11-17)
 
 - When every URL in the list is already open, the Open button reads "All open" and is disabled. It used to read "Open 0 URLs" on the default list. Copy stays live, and Ctrl or Cmd+Enter still reports "All N URLs are already open." (ruling 38).
