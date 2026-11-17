@@ -8,7 +8,7 @@ import { writeClipboard } from '@/utils/clipboard';
 import { toErrorMessage } from '@/utils/errors';
 import { type Entry, parseList, urlKey } from '@/utils/extract-urls';
 import { formatExample, formatTabs } from '@/utils/formatters';
-import { openLabel, planOpen, remainingText } from '@/utils/open-plan';
+import { allOpen, openLabel, planOpen, remainingText } from '@/utils/open-plan';
 import { resolveTabs } from '@/utils/tabs-source';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -29,6 +29,8 @@ interface ListActionsArgs {
 /** The labels, the messages, and the two actions. */
 interface ListActions {
   openLabel: string;
+  /** True when every URL in the list is already open: the Open button is disabled and reads "All open". */
+  allOpen: boolean;
   copyLabel: string;
   example: string;
   status: string;
@@ -180,6 +182,7 @@ export function useListActions({ text, setText, known, format }: ListActionsArgs
 
   return {
     openLabel: openLabel(plan, CONFIG.MAX_TABS, resumeText !== null && resumeText === text),
+    allOpen: allOpen(plan),
     copyLabel: `Copy ${urlCount} as ${format}`,
     example:
       first === undefined

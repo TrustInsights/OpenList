@@ -81,6 +81,7 @@ function PopupContent(): React.JSX.Element {
         onOpen={open}
         onCopy={() => void actions.copy()}
         disabled={actions.running}
+        openDisabled={actions.allOpen}
       />
       <FormatSelect value={format} onChange={changeFormat} example={actions.example} />
       <StatusLine message={status.text} id={status.id} />

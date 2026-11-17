@@ -39,13 +39,24 @@ export function planOpen(text: string, openKeys: ReadonlySet<string>, cap: numbe
 }
 
 /**
+ * Tells whether every URL in the list is already open, so a click would open nothing.
+ * An empty list is not "all open".
+ * @param plan - The current plan.
+ * @returns True when at least one URL was skipped as open and nothing is left to open.
+ */
+export function allOpen(plan: OpenPlan): boolean {
+  return plan.skipped.length > 0 && plan.batch.length === 0 && plan.waiting.length === 0;
+}
+
+/**
  * Writes the label of the Open button.
  * @param plan - The current plan.
  * @param cap - The most tabs one click opens.
  * @param continuing - True after a click opened part of the list.
- * @returns For example "Open 3 URLs", "Open first 20 of 45", or "Open next 20 of 25".
+ * @returns For example "Open 3 URLs", "Open first 20 of 45", "Open next 20 of 25", or "All open".
  */
 export function openLabel(plan: OpenPlan, cap: number, continuing: boolean): string {
+  if (allOpen(plan)) return 'All open';
   const total = plan.batch.length + plan.waiting.length;
   if (total > cap) return `Open ${continuing ? 'next' : 'first'} ${cap} of ${total}`;
   return `Open ${total} ${total === 1 ? 'URL' : 'URLs'}`;

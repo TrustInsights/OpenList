@@ -148,7 +148,8 @@ describe('App open', () => {
     await loadedApp();
     const box = screen.getByRole('textbox');
     await user.clear(box);
-    await user.click(screen.getByRole('button', { name: 'Open 0 URLs' }));
+    await user.click(screen.getByLabelText('URLs, one per line'));
+    await user.keyboard('{Control>}{Enter}{/Control}');
     const alert = await screen.findByRole('alert');
     expect(alert).toHaveTextContent('Please enter some URLs or text to search.');
     expect(box).toHaveAttribute('aria-invalid', 'true');
@@ -161,7 +162,8 @@ describe('App open', () => {
 
   it("all URLs open already: 'All 3 URLs are already open.'", async () => {
     await loadedApp();
-    await user.click(screen.getByRole('button', { name: 'Open 0 URLs' }));
+    await user.click(screen.getByLabelText('URLs, one per line'));
+    await user.keyboard('{Control>}{Enter}{/Control}');
     await waitFor(() =>
       expect(screen.getByRole('status')).toHaveTextContent('All 3 URLs are already open.')
     );
@@ -172,7 +174,8 @@ describe('App open', () => {
 describe('App status after a source change', () => {
   it('Open says "All 3 URLs are already open." again after a source change between two clicks', async () => {
     await loadedApp();
-    await user.click(screen.getByRole('button', { name: 'Open 0 URLs' }));
+    await user.click(screen.getByLabelText('URLs, one per line'));
+    await user.keyboard('{Control>}{Enter}{/Control}');
     await waitFor(() =>
       expect(screen.getByRole('status')).toHaveTextContent('All 3 URLs are already open.')
     );
@@ -181,7 +184,8 @@ describe('App status after a source change', () => {
     expect(screen.getByRole('status')).toHaveTextContent(
       'List replaced with 3 tabs from this window.'
     );
-    await user.click(screen.getByRole('button', { name: 'Open 0 URLs' }));
+    await user.click(screen.getByLabelText('URLs, one per line'));
+    await user.keyboard('{Control>}{Enter}{/Control}');
     expect(screen.getByRole('status')).toHaveTextContent(/^All 3 URLs are already open\.$/);
     expect(send).not.toHaveBeenCalled();
   });
@@ -204,9 +208,11 @@ describe('App status after a source change', () => {
 
   it('the status node is new when the same result repeats', async () => {
     await loadedApp();
-    await user.click(screen.getByRole('button', { name: 'Open 0 URLs' }));
+    await user.click(screen.getByLabelText('URLs, one per line'));
+    await user.keyboard('{Control>}{Enter}{/Control}');
     const first = await screen.findByText('All 3 URLs are already open.');
-    await user.click(screen.getByRole('button', { name: 'Open 0 URLs' }));
+    await user.click(screen.getByLabelText('URLs, one per line'));
+    await user.keyboard('{Control>}{Enter}{/Control}');
     expect(screen.getByText('All 3 URLs are already open.')).not.toBe(first);
   });
 });

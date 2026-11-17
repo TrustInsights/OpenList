@@ -32,7 +32,8 @@ test.describe('Open', () => {
 
     await page.locator('#list').fill(urls.join('\n'));
     await page.bringToFront();
-    await openButton(page).click();
+    await expect(page.getByRole('button', { name: 'All open' })).toBeDisabled();
+    await page.locator('#list').press('Control+Enter');
     await expect(page.getByRole('status')).toHaveText('All 3 URLs are already open.');
     expect(await countTabs(site.origin)).toBe(3);
   });

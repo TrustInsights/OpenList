@@ -49,7 +49,7 @@ test.describe('Popup', () => {
 
     await expect(page.getByRole('heading', { name: 'OpenList', level: 1 })).toBeVisible();
     await expect(page.getByLabel('URLs, one per line')).toBeFocused();
-    await expect(page.getByRole('button', { name: /^Open / })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^(Open \d+ URLs?|All open)$/ })).toBeVisible();
     await expect(page.getByRole('button', { name: /^Copy \d+ as URL$/ })).toBeVisible();
     await expect(page.getByLabel('From')).toHaveValue('tab');
 

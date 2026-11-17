@@ -39,11 +39,12 @@ describe('useListActions labels and example', () => {
     expect(actions.current.copyLabel).toBe('Copy 1 as CSV');
   });
 
-  it("openLabel is 'Open 0 URLs' when all are open", async () => {
+  it("openLabel is 'All open' and allOpen is true when all are open", async () => {
     const actions = await renderActions(THREE, {
       open: ['https://a.com/', 'https://b.com/', 'https://c.com/'],
     });
-    await waitFor(() => expect(actions.current.openLabel).toBe('Open 0 URLs'));
+    await waitFor(() => expect(actions.current.openLabel).toBe('All open'));
+    expect(actions.current.allOpen).toBe(true);
   });
 
   it('openLabel counts only the URLs that are not open and uses the singular', async () => {

@@ -11,7 +11,7 @@ The owner did not decide these. Each is marked "(My call.)" in the section it af
 1. The implementation plan covers phases 1 to 9. The feature waits for phases 1 to 6 and phase 8. Only phase 7 runs in parallel.
 2. Source order for "From": Selected tabs, then Clipboard, then This window. A window with one tab starts at "This tab".
 3. After Open, a whole line leaves the list when all its URLs were opened or skipped, and only if at least one tab opened. Ignored lines stay. Skipped URLs do not count toward the 20-tab cap.
-4. The Open count excludes URLs that are already open. On the default list it reads "Open 0 URLs", and the status line explains.
+4. The Open count excludes URLs that are already open. When every URL in the list is already open, the Open button reads "All open" and is disabled (owner decision 23, option A); Ctrl or Cmd+Enter still reports "All N URLs are already open." An empty list still reads "Open 0 URLs".
 5. The parsing rule (section 6.1): detect JSON, the CSV header, or HTML first. Otherwise read line by line: addresses, then site-like lines, then searches.
 6. A blank line always ends a group. CSV, JSON, and HTML table are flat and carry a window field.
 7. Round trip means the same page, not the same string. Title does not round-trip.
@@ -121,7 +121,7 @@ Rules:
 
 - Opens each URL as a background tab, in list order, with the existing retry and delay.
 - Skips a URL that is already open in the current window. The status line reports it: "Opened 4, skipped 2 already open."
-- The Open count N excludes URLs that are already open. On the default list (this window's tabs) every URL is already open, so the button reads "Open 0 URLs". That tells the user Copy is the useful action. (My call, after the advisor review.)
+- The Open count N excludes URLs that are already open. On the default list (this window's tabs) every URL is already open, so the button reads "All open" and is disabled. That tells the user Copy is the useful action. (Owner decision 23, option A.) (My call, after the advisor review.)
 - If a click opens nothing, the list does not change, and the status line says "All 6 URLs are already open." Lines that were skipped leave the list only when at least one tab opened.
 - The list is stored as raw text. The popup finds the URLs in each line and remembers which line each URL came from. After an Open, a line leaves the list when every URL in it has been opened or skipped as already open. A line with no URL (an ignored line) stays. A line with some URLs left stays whole. (My call.)
 - Skipped URLs do not count toward the cap. Only opened tabs count, so "Open first 20 of 45" opens 20 tabs unless fewer URLs remain after skips. (My call.)

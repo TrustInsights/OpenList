@@ -1,7 +1,7 @@
 // Unit tests for utils/open-plan.ts: the open plan, the button label, and the remaining text
 
 import { urlKey } from '@/utils/extract-urls';
-import { type OpenPlan, openLabel, planOpen, remainingText } from '@/utils/open-plan';
+import { type OpenPlan, allOpen, openLabel, planOpen, remainingText } from '@/utils/open-plan';
 import { describe, expect, it } from 'vitest';
 
 const CAP = 20;
@@ -97,11 +97,20 @@ describe('openLabel', () => {
     expect(openLabel(plan(manyUrls(5)), CAP, true)).toBe('Open 5 URLs');
   });
 
-  it('excludes open URLs from the count and reads Open 0 URLs when all are open', () => {
+  it('excludes open URLs from the count and reads All open when every URL is open', () => {
     const six = manyUrls(6);
     const all = Array.from({ length: 6 }, (_, i) => `https://site${i}.com/page`);
-    expect(openLabel(plan(six, all), CAP, false)).toBe('Open 0 URLs');
+    expect(openLabel(plan(six, all), CAP, false)).toBe('All open');
+    expect(allOpen(plan(six, all))).toBe(true);
+    expect(allOpen(plan(six, all.slice(0, 2)))).toBe(false);
     expect(openLabel(plan(six, all.slice(0, 2)), CAP, false)).toBe('Open 4 URLs');
+  });
+});
+
+describe('allOpen', () => {
+  it('is false for an empty list, which still reads Open 0 URLs', () => {
+    expect(allOpen(planOpen('', new Set(), CAP))).toBe(false);
+    expect(openLabel(planOpen('', new Set(), CAP), CAP, false)).toBe('Open 0 URLs');
   });
 });
 

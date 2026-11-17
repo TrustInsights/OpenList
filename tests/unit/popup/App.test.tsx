@@ -48,9 +48,10 @@ describe('App first render', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
-  it("with 3 tabs mocked, shows 'Open 0 URLs' (all open), 'Copy 3 as URL', and the example line", async () => {
+  it("with 3 tabs mocked, shows a disabled 'All open', 'Copy 3 as URL', and the example line", async () => {
     await loadedApp();
-    expect(screen.getByRole('button', { name: 'Open 0 URLs' })).toHaveClass('btn-open');
+    expect(screen.getByRole('button', { name: 'All open' })).toHaveClass('btn-open');
+    expect(screen.getByRole('button', { name: 'All open' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Copy 3 as URL' })).toHaveClass('btn-copy');
     expect(screen.getByLabelText('Copy as')).toHaveAccessibleDescription(
       'Example: https://site1.com/'
@@ -81,12 +82,13 @@ describe('App first render', () => {
     await loadedApp();
     const user = userEvent.setup();
     const seen: string[] = [];
-    for (let step = 0; step < 5; step += 1) {
+    for (let step = 0; step < 4; step += 1) {
       const active = document.activeElement;
       seen.push(active?.getAttribute('id') ?? active?.textContent ?? '');
       await user.tab();
     }
-    expect(seen).toEqual(['list', 'source', 'Open 0 URLs', 'Copy 3 as URL', 'format']);
+    // A disabled Open button ("All open") is skipped by the Tab key.
+    expect(seen).toEqual(['list', 'source', 'Copy 3 as URL', 'format']);
     // happy-dom does not skip the closed Details content, so the rest is checked by document order.
     const summary = screen.getByText('Details', { selector: 'summary' });
     const link = screen.getByRole('link');

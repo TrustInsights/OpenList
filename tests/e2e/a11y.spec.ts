@@ -134,6 +134,8 @@ test.describe('keyboard', () => {
     await popup(page);
     await page.getByRole('button', { name: 'Not now' }).click();
     await expect(page.getByRole('button', { name: 'Not now' })).toHaveCount(0);
+    // Open is disabled when every URL is open, and Tab skips a disabled button. A new URL enables it.
+    await page.locator('#list').fill('https://example.com/new');
 
     const stops = await tabThrough(page, 6);
 
@@ -154,6 +156,7 @@ test.describe('keyboard', () => {
   }) => {
     const page = await context.newPage();
     await popup(page);
+    await page.locator('#list').fill('https://example.com/new');
 
     const stops = await tabThrough(page, 8);
 
@@ -186,6 +189,7 @@ test.describe('keyboard', () => {
       await expect(
         page.locator('details').getByRole('button', { name: 'Turn on clipboard detection' })
       ).toBeVisible();
+      await page.locator('#list').fill('https://example.com/new');
 
       const stops = await tabThrough(page, 8);
 

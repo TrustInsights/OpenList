@@ -8,6 +8,10 @@ Nothing yet.
 
 ## [1.2.0] - 2026-11-17
 
+### Changed (owner decision 23, 2026-11-17)
+
+- When every URL in the list is already open, the Open button reads "All open" and is disabled. It used to read "Open 0 URLs" on the default list. Copy stays live, and Ctrl or Cmd+Enter still reports "All N URLs are already open." (ruling 38).
+
 ### Fixed (final review, 2026-11-17)
 
 - Clipboard detection reads text with the same rules as the list. A first draft of the 2026-11-17 clipboard fix scanned the raw text for addresses. That skipped the Copy shapes, so a tab title that held an address added a page again, and the `&amp;` in the `href` of OpenList's own HTML output was kept in the address. `webAddresses` now uses `parseList` with an explicit-only option. Tests: `readClipboardUrls` with OpenList's own Markdown, BBCode, Title & URL, Link, URL, HTML, and HTML table output.

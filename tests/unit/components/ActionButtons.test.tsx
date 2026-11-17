@@ -16,12 +16,28 @@ function setup(disabled = false): { onOpen: () => void; onCopy: () => void } {
       onOpen={onOpen}
       onCopy={onCopy}
       disabled={disabled}
+      openDisabled={false}
     />
   );
   return { onOpen, onCopy };
 }
 
 describe('ActionButtons', () => {
+  it('disables only Open, and keeps Copy live, when every URL is already open', () => {
+    render(
+      <ActionButtons
+        openLabel="All open"
+        copyLabel="Copy 3 as URL"
+        onOpen={() => undefined}
+        onCopy={() => undefined}
+        disabled={false}
+        openDisabled
+      />
+    );
+    expect(screen.getByRole('button', { name: 'All open' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Copy 3 as URL' })).toBeEnabled();
+  });
+
   it('has no accessibility violations', async () => {
     const { container } = render(
       <ActionButtons
@@ -30,6 +46,7 @@ describe('ActionButtons', () => {
         onOpen={() => undefined}
         onCopy={() => undefined}
         disabled={false}
+        openDisabled={false}
       />
     );
     expect(await axe(container)).toHaveNoViolations();

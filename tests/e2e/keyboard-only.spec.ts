@@ -10,6 +10,8 @@ test.describe('Keyboard only', () => {
     const page = await context.newPage();
     await popup(page);
     await page.getByRole('button', { name: 'Not now' }).click();
+    // A new URL keeps Open enabled: Tab skips a disabled Open ("All open").
+    await page.locator('#list').fill('https://example.com/new');
 
     await page.locator('#list').focus();
     await page.keyboard.press('Tab');
