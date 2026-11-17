@@ -37,6 +37,7 @@ describe('useFormat', () => {
     useFakeStorage();
     vi.mocked(chrome.storage.local.get).mockRejectedValueOnce(new Error('storage down'));
     const { result } = renderHook(() => useFormat());
+    await waitFor(() => expect(chrome.storage.local.get).toHaveBeenCalled());
     await act(async () => {});
     expect(result.current.format).toBe('URL');
     act(() => result.current.changeFormat('CSV'));
@@ -46,8 +47,9 @@ describe('useFormat', () => {
   it('keeps the new format when saving fails', async () => {
     const storage = useFakeStorage({ failLocalSets: 1 });
     const { result } = renderHook(() => useFormat());
-    await act(async () => {});
+    await waitFor(() => expect(chrome.storage.local.get).toHaveBeenCalled());
     act(() => result.current.changeFormat('BBCode'));
+    await waitFor(() => expect(chrome.storage.local.set).toHaveBeenCalledTimes(1));
     await act(async () => {});
     expect(result.current.format).toBe('BBCode');
     expect(storage.local.settings).toBeUndefined();

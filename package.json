@@ -16,7 +16,7 @@
     "knip": "knip --production && knip",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm knip && pnpm run audit && pnpm size",
     "audit": "pnpm audit --audit-level=high",
-    "size": "pnpm build && size-limit",
+    "size": "vite build && size-limit",
     "index:qmd": "sh src/tools/qmd-index.sh",
     "package": "pnpm build && sh src/tools/package-release.sh",
     "store-images": "pnpm build && playwright test tests/e2e/store-images.spec.ts"

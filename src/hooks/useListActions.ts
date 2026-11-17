@@ -1,5 +1,6 @@
 // Hook that runs the Open and Copy actions on the list text and builds their labels
 
+import { useSeqMessage } from '@/hooks/useSeqMessage';
 import { CONFIG } from '@/schemas/config';
 import { OpenListMessageSchema, OpenListResponseSchema } from '@/schemas/messages';
 import type { Format } from '@/schemas/settings';
@@ -10,7 +11,8 @@ import { parseList, urlKey } from '@/utils/extract-urls';
 import { formatExample, formatTabs } from '@/utils/formatters';
 import { allOpen, entryUrl, openLabel, planOpen, remainingText } from '@/utils/open-plan';
 import { resolveTabs } from '@/utils/tabs-source';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { counted } from '@/utils/text';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 /** The error that an Open click on an empty list shows. The popup hides it when the user types. */
 export const EMPTY_LIST_ERROR = 'Please enter some URLs or text to search.';
@@ -43,16 +45,6 @@ interface ListActions {
 }
 
 /**
- * Writes a count with its noun.
- * @param count - The count.
- * @param noun - The singular noun.
- * @returns For example "1 URL" or "2 URLs".
- */
-function counted(count: number, noun: string): string {
-  return `${count} ${noun}${count === 1 ? '' : 's'}`;
-}
-
-/**
  * Cuts a line to the example length.
  * @param line - The example line.
  * @returns The line, or its start and an ellipsis when it is long.
@@ -69,28 +61,28 @@ function shorten(line: string): string {
  */
 export function useListActions({ text, setText, known, format }: ListActionsArgs): ListActions {
   const [openKeys, setOpenKeys] = useState<ReadonlySet<string>>(new Set());
-  const [{ text: status, seq: statusSeq }, setStatusState] = useState({ text: '', seq: 0 });
+  const { text: status, seq: statusSeq, setMessage: setStatus } = useSeqMessage();
   const [error, setError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
   const [resumeText, setResumeText] = useState<string | null>(null);
 
-  const setStatus = useCallback((message: string): void => {
-    setStatusState((previous) => ({ text: message, seq: previous.seq + 1 }));
-  }, []);
+  const lastKeys = useRef<ReadonlySet<string>>(openKeys);
 
-  const refreshOpenKeys = useCallback(async (): Promise<void> => {
+  const refreshOpenKeys = useCallback(async (): Promise<ReadonlySet<string>> => {
     try {
       const tabs = await chrome.tabs.query({ currentWindow: true });
-      setOpenKeys(
-        new Set(
-          tabs.flatMap((tab) => {
-            const url = tab.url || tab.pendingUrl;
-            return url ? [urlKey(url)] : [];
-          })
-        )
+      const keys = new Set(
+        tabs.flatMap((tab) => {
+          const url = tab.url || tab.pendingUrl;
+          return url ? [urlKey(url)] : [];
+        })
       );
+      lastKeys.current = keys;
+      setOpenKeys(keys);
+      return keys;
     } catch {
       // Keep the last lookup. A wrong label is better than a broken popup.
+      return lastKeys.current;
     }
   }, []);
 
@@ -117,15 +109,17 @@ export function useListActions({ text, setText, known, format }: ListActionsArgs
       setError(EMPTY_LIST_ERROR);
       return;
     }
-    if (plan.batch.length === 0) {
-      const count = plan.skipped.length;
-      setStatus(`All ${counted(count, 'URL')} ${count === 1 ? 'is' : 'are'} already open.`);
-      return;
-    }
     setRunning(true);
     try {
+      // Look up the open tabs again: the popup may have loaded long ago, and the first lookup may not have landed.
+      const fresh = planOpen(parsed.entries, await refreshOpenKeys(), CONFIG.MAX_TABS);
+      if (fresh.batch.length === 0) {
+        const count = fresh.skipped.length;
+        setStatus(`All ${counted(count, 'URL')} ${count === 1 ? 'is' : 'are'} already open.`);
+        return;
+      }
       const raw = await chrome.runtime.sendMessage(
-        OpenListMessageSchema.parse({ action: 'openList', urls: plan.batch.map(entryUrl) })
+        OpenListMessageSchema.parse({ action: 'openList', urls: fresh.batch.map(entryUrl) })
       );
       const reply = OpenListResponseSchema.safeParse(raw);
       if (!reply.success) {
@@ -138,12 +132,12 @@ export function useListActions({ text, setText, known, format }: ListActionsArgs
       }
       if (opened.length === 0) return;
       const openedUrls = new Set(opened);
-      const openedEntries = plan.batch.filter((entry) => openedUrls.has(entryUrl(entry)));
-      const next = remainingText(text, plan, openedEntries);
+      const openedEntries = fresh.batch.filter((entry) => openedUrls.has(entryUrl(entry)));
+      const next = remainingText(text, fresh, openedEntries);
       setText(next);
       setResumeText(next);
       const skipped =
-        plan.skipped.length > 0 ? `, skipped ${plan.skipped.length} already open` : '';
+        fresh.skipped.length > 0 ? `, skipped ${fresh.skipped.length} already open` : '';
       setStatus(`Opened ${openedEntries.length}${skipped}.`);
       await refreshOpenKeys();
     } catch (err) {

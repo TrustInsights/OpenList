@@ -25,6 +25,7 @@ describe('useDetails', () => {
     storage.session.openSince = 1000;
     const interval = vi.spyOn(globalThis, 'setInterval');
     const { result } = renderHook(() => useDetails());
+    // Only microtasks are pending (the fake storage resolves at once), and waitFor sets an interval.
     await act(async () => {});
     expect(result.current.totals).toEqual(TOTALS);
     expect(result.current.openSince).toBe(1000);

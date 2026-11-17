@@ -16,6 +16,8 @@ export function sleep(ms: number): Promise<void> {
 
 /**
  * Creates a new background tab for the given URL, retrying on failure.
+ * Chrome rejects chrome.tabs.create for a short time while the user drags a tab ("Tabs cannot be edited right now"),
+ * so every failure gets two more tries after a short, growing delay. The last error is thrown.
  * @param url - The URL to open
  * @returns The created Chrome tab
  */

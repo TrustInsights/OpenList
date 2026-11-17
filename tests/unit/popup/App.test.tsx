@@ -50,8 +50,10 @@ describe('App first render', () => {
 
   it("with 3 tabs mocked, shows a disabled 'All open', 'Copy 3 as URL', and the example line", async () => {
     await loadedApp();
-    expect(screen.getByRole('button', { name: 'All open' })).toHaveClass('btn-open');
-    expect(screen.getByRole('button', { name: 'All open' })).toBeDisabled();
+    // The open-tab lookup lands apart from the tab load, so wait for the label.
+    const allOpen = await screen.findByRole('button', { name: 'All open' });
+    expect(allOpen).toHaveClass('btn-open');
+    expect(allOpen).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Copy 3 as URL' })).toHaveClass('btn-copy');
     expect(screen.getByLabelText('Copy as')).toHaveAccessibleDescription(
       'Example: https://site1.com/'
@@ -80,6 +82,8 @@ describe('App first render', () => {
   it('follows the layout order of the design when a user tabs through it', async () => {
     (chrome.permissions.contains as ReturnType<typeof vi.fn>).mockResolvedValue(true);
     await loadedApp();
+    // Tab skips Open only after the open-tab lookup lands and the button reads "All open".
+    await screen.findByRole('button', { name: 'All open' });
     const user = userEvent.setup();
     const seen: string[] = [];
     for (let step = 0; step < 4; step += 1) {

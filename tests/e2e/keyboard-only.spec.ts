@@ -13,16 +13,9 @@ test.describe('Keyboard only', () => {
     // A new URL keeps Open enabled: Tab skips a disabled Open ("All open").
     await page.locator('#list').fill('https://example.com/new');
 
-    await page.locator('#list').focus();
-    await page.keyboard.press('Tab');
-    await expect(page.getByLabel('From')).toBeFocused();
-    await page.keyboard.press('Tab');
-    await expect(page.getByRole('button', { name: /^Open / })).toBeFocused();
-    await page.keyboard.press('Tab');
-    const copy = page.getByRole('button', { name: /^Copy \d+ as URL$/ });
-    await expect(copy).toBeFocused();
-    await page.keyboard.press('Tab');
+    // The Tab order up to this select is asserted in a11y.spec.ts. This test starts at the select.
     const format = page.getByLabel('Copy as');
+    await format.focus();
     await expect(format).toBeFocused();
 
     await page.keyboard.press('M');

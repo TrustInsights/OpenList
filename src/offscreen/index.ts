@@ -6,8 +6,9 @@ import { toErrorMessage } from '@/utils/errors';
 import type { ClipboardPayload } from '@/utils/formatters';
 
 /**
- * Copies with the old copy command when the async clipboard API refuses, as it does
- * for a page that has no focus. A copy event handler puts both flavors on the clipboard.
+ * Copies with the old copy command when the async clipboard API refuses. In Chrome the
+ * offscreen page never has focus, so the API rejects with "Document is not focused" and this
+ * command does the write (ruling 45). A copy event handler puts both flavors on the clipboard.
  * @param payload - The text and the optional HTML flavor
  * @returns A promise that resolves after the copy and rejects when the command fails
  */

@@ -8,6 +8,18 @@ Nothing yet.
 
 ## [1.2.0] - 2026-11-17
 
+### Fixed (open race, 2026-11-17)
+
+- Open no longer opens a tab that is already open. The popup read the open tabs once at start, so an Open before that lookup landed, or after a tab opened since the popup loaded, planned from an empty or old set. `open()` now sets `running`, looks the open tabs up again, and plans from that fresh lookup for the empty check, the message, the status, and the list text that stays. A failed lookup falls back to the last known tabs. Tests: `tests/unit/hooks/useListActions-race.test.ts` (ruling 45).
+
+### Changed (deferred items, 2026-11-17)
+
+- One `useSeqMessage` hook (`src/hooks/useSeqMessage.ts`) holds the message and counter that `useSources` (notice) and `useListActions` (status) copied. One `counted()` in `src/utils/text.ts` replaces the plural logic in both hooks. Tests: `useSeqMessage.test.ts`, `text.test.ts`.
+- `keyboard-only.spec.ts` starts at the "Copy as" select. The Tab order before it stays asserted in `a11y.spec.ts`. `tests/helpers/popup-layout.ts` moved into `reflow.spec.ts` (its only caller) and the helper file is gone.
+- `pnpm size` runs `vite build && size-limit`, so `pnpm check` type-checks once. `build` keeps its tsc step.
+- Flaky-test hunt: tests that read state before an async Chrome lookup landed now wait for it (`App.test.tsx` "All open" and the Tab order test, the two empty-window tests of `useSources.test.ts`, the failure tests of `useFormat.test.ts`).
+- Kept after a check, with the evidence in ruling 45: `TabRecordSchema` (rule line 182 asks for Zod on API data), the `copyWithCommand` fallback (real Chromium rejects `navigator.clipboard` in the offscreen page with "Document is not focused"), and the `createTab` retry (Chrome rejects `tabs.create` while a user drags a tab). The `createTab` and `copyWithCommand` comments now say so.
+
 ### Removed (Chisle review, 2026-11-17)
 
 - `lastError` and `recordError`: write-only (nothing read them), and a Chrome error text can hold a page address, against the promise that the totals never hold a URL (ruling 39). The totals keep three counters. Failed opens still count and show in the popup.

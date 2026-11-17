@@ -98,8 +98,8 @@ describe('useSources default source', () => {
   it('an empty window starts at window with an empty list', async () => {
     mockWindows([[]]);
     const { result } = renderHook(() => useSources());
-    await waitFor(() => expect(chrome.windows.getAll).toHaveBeenCalled());
-    await act(async () => {});
+    // The prompt leaves 'hidden' only when the load has ended, because no permission is granted.
+    await waitFor(() => expect(result.current.clipboardPrompt).toBe('button'));
     expect(result.current.source).toBe('window');
     expect(result.current.text).toBe('');
   });
@@ -173,7 +173,7 @@ describe('useSources changes', () => {
   it('changeSource to tab in a window without tabs gives an empty list', async () => {
     mockWindows([[]]);
     const { result } = renderHook(() => useSources());
-    await act(async () => {});
+    await waitFor(() => expect(result.current.clipboardPrompt).toBe('button'));
     act(() => result.current.changeSource('tab'));
     expect(result.current.text).toBe('');
   });

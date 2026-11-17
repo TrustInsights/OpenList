@@ -1,5 +1,6 @@
 // Hook that fills the list from a source (tabs or clipboard) and tracks the From choice
 
+import { useSeqMessage } from '@/hooks/useSeqMessage';
 import type { SourceId } from '@/schemas/settings';
 import type { TabRecord } from '@/schemas/tab';
 import {
@@ -10,6 +11,7 @@ import {
 import { getClipboardPromptDismissed, setClipboardPromptDismissed } from '@/utils/settings-store';
 import { type SourceCounts, chooseDefaultSource, sourceOptions } from '@/utils/source-choice';
 import { type LoadedTabs, loadTabs } from '@/utils/tabs-source';
+import { counted } from '@/utils/text';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 /** The state the popup shows for the list and its source. */
@@ -112,7 +114,7 @@ function pickDefault(loaded: LoadedTabs, clipboard: readonly string[]): Pick {
 function replacedNotice(id: SourceId, text: string): string {
   const count = text.split(/\n+/).filter(Boolean).length;
   const noun = id === 'clipboard' ? 'URL' : 'tab';
-  return `List replaced with ${count} ${noun}${count === 1 ? '' : 's'} from ${SOURCE_NAMES[id]}.`;
+  return `List replaced with ${counted(count, noun)} from ${SOURCE_NAMES[id]}.`;
 }
 
 /**
@@ -126,14 +128,10 @@ export function useSources(): SourcesState {
   const [clipboard, setClipboard] = useState<string[]>([]);
   const [source, setSource] = useState<SourceId>('window');
   const [text, setTextState] = useState('');
-  const [{ text: notice, seq: noticeSeq }, setNoticeState] = useState({ text: '', seq: 0 });
+  const { text: notice, seq: noticeSeq, setMessage: setNotice } = useSeqMessage();
   const [permission, setPermission] = useState<'unknown' | 'granted' | 'denied'>('unknown');
   const [dismissed, setDismissed] = useState(false);
   const touched = useRef(false);
-
-  const setNotice = useCallback((message: string): void => {
-    setNoticeState((previous) => ({ text: message, seq: previous.seq + 1 }));
-  }, []);
 
   const applyPick = useCallback(
     (pick: Pick): void => {
