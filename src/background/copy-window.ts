@@ -14,7 +14,8 @@ import { loadTabs } from '@/utils/tabs-source';
 const OFFSCREEN_PATH = 'offscreen/index.html';
 
 /** The toolbar text when the user did not yet grant the clipboard permissions in the popup. */
-const NEEDS_PERMISSION = 'Open OpenList once to turn on copying.';
+const NEEDS_PERMISSION =
+  'Open OpenList and press "Turn on clipboard detection" once to turn on copying.';
 
 /** The text Chrome uses when an offscreen document is already open. */
 const SINGLE_DOCUMENT_ERROR = 'Only a single offscreen document may be created';

@@ -13,9 +13,11 @@ describe('ClipboardPrompt', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
-  it('states that the clipboard text is never saved or sent', () => {
+  it('says what the button does and that nothing is sent', () => {
     render(<ClipboardPrompt onEnable={() => undefined} onDismiss={() => undefined} />);
-    expect(screen.getByText(/never saved or sent/)).toBeInTheDocument();
+    expect(
+      screen.getByText('Finds copied URLs and enables the copy shortcut. Nothing is sent.')
+    ).toBeInTheDocument();
   });
 
   it('calls onEnable for "Turn on clipboard detection"', async () => {

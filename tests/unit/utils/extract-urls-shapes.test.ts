@@ -33,6 +33,12 @@ describe('Title & URL item', () => {
   });
 });
 
+describe('a Copy shape whose address does not parse', () => {
+  it('falls back to the address scan, which gives nothing for an invalid address', () => {
+    expect(read('Note: https://%')).toEqual([]);
+  });
+});
+
 describe('Link item', () => {
   it('takes only the address in the last parentheses when the title holds an address', () => {
     expect(read('See https://evil.example/x (https://good.example/a_(b)?x=1)')).toEqual([
@@ -44,6 +50,50 @@ describe('Link item', () => {
     expect(read('Quarterly report (https://docs.example.com/q3)')).toEqual([
       'https://docs.example.com/q3',
     ]);
+  });
+});
+
+describe('Link shape with spaces in typed text', () => {
+  it('keeps both addresses of "Links (https://a.example/, https://b.example/)"', () => {
+    expect(read('Links (https://a.example/, https://b.example/)')).toEqual([
+      'https://a.example/',
+      'https://b.example/',
+    ]);
+  });
+
+  it('never makes one false address out of two with words between', () => {
+    expect(read('Sources (https://a.example/1 and https://b.example/2)')).toEqual([
+      'https://a.example/1',
+      'https://b.example/2',
+    ]);
+  });
+});
+
+describe('Unicode line separators in a title', () => {
+  it.each(['\u2028', '\u2029'])(
+    'a title with %j still gives only the last address',
+    (separator) => {
+      expect(read(`See https://evil.example/x${separator}more: https://good.example/a`)).toEqual([
+        'https://good.example/a',
+      ]);
+      expect(read(`See https://evil.example/x${separator}more (https://good.example/a)`)).toEqual([
+        'https://good.example/a',
+      ]);
+    }
+  );
+});
+
+describe('hostile text does not take quadratic time', () => {
+  it('reads 220 kB of repeated " (https://a" in well under a second', () => {
+    const started = performance.now();
+    parseList(' (https://a'.repeat(20_000));
+    expect(performance.now() - started).toBeLessThan(500);
+  });
+
+  it('reads 220 kB of repeated ": https://a" in well under a second', () => {
+    const started = performance.now();
+    parseList(': https://a'.repeat(22_000));
+    expect(performance.now() - started).toBeLessThan(500);
   });
 });
 
@@ -78,6 +128,18 @@ describe('webAddresses', () => {
       'https://a.example/',
       'https://b.example/',
     ]);
+  });
+
+  it('skips a bare domain inside JSON, and keeps the explicit address', () => {
+    expect(webAddresses('[{"url":"example.com"},{"url":"https://b.example/"}]')).toEqual([
+      'https://b.example/',
+    ]);
+  });
+
+  it('skips a bare domain inside a CSV row', () => {
+    expect(
+      webAddresses('title,url,window,index,pinned,active\n"A","example.com",1,0,false,true')
+    ).toEqual([]);
   });
 
   it('skips an address that does not parse', () => {

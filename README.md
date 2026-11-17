@@ -45,7 +45,7 @@ Pick the format in the "Copy as" control. OpenList remembers it. The first forma
 Link and HTML table also put a rich version on the clipboard, so a word processor or a spreadsheet pastes real links or a table. Every format that holds URLs reads back into the list.
 
 ### Copy this window without the popup
-Press Alt+Shift+C, or right-click the OpenList toolbar icon and select "Copy this window's tabs". OpenList copies the tabs of the current window in your chosen format. The toolbar icon shows a check mark or an exclamation mark, and its title tells the result. Change the shortcut at `chrome://extensions/shortcuts`.
+Press Alt+Shift+C, or right-click the OpenList toolbar icon and select "Copy this window's tabs". OpenList copies the tabs of the current window in your chosen format. The toolbar icon shows a check mark or an exclamation mark, and its title tells the result. The first time, open the popup and click **Turn on clipboard detection** once. Chrome asks you to allow the clipboard, and then the shortcut and the toolbar item work. Change the shortcut at `chrome://extensions/shortcuts`.
 
 ### Clipboard button
 Click **Turn on clipboard detection** once. Chrome asks you to allow reading and writing the clipboard. Then OpenList uses a copied list of two or more URLs when you open the popup, and the shortcut can write the clipboard. Click "Not now" to move the button into Details.
@@ -85,7 +85,8 @@ Click **Turn on clipboard detection** once. Chrome asks you to allow reading and
   - Ten copy formats, remembered between uses
   - Copy this window's tabs with Alt+Shift+C or the toolbar menu, without the popup
   - Detects a copied URL list when you allow the optional clipboard permission
-  - Skips URLs that are already open
+  - Skips URLs that are already open, also for the right-click "Open selected URLs" item
+  - "Title & URL" and "Link" lines read back as the same pages, even when a tab title holds an address
   - New look in light and dark mode, with keyboard support, a visible focus ring, and tested color contrast (see docs/accessibility.md for the checks and the open items)
   - Totals now survive a browser restart
   - Needs Chrome 110 or later
@@ -115,7 +116,7 @@ Click **Turn on clipboard detection** once. Chrome asks you to allow reading and
 
 ## Contributing
 
-Please open an issue on [the GitHub issue tracker for this project](https://github.com/cdzombak/OpenList/issues).
+Please open an issue on [the GitHub issue tracker for this project](https://github.com/TrustInsights/OpenList/issues).
 
 ## Development
 
@@ -127,7 +128,7 @@ Please open an issue on [the GitHub issue tracker for this project](https://gith
 ### Setup
 
 ```bash
-git clone https://github.com/cdzombak/OpenList.git
+git clone https://github.com/TrustInsights/OpenList.git
 cd OpenList
 pnpm install
 ```
@@ -187,5 +188,5 @@ MIT. See `LICENSE` included in this repo.
 
 ## Contact
 
-* For bugs and features: Use the [GitHub issue tracker](https://github.com/cdzombak/OpenList/issues)
+* For bugs and features: Use the [GitHub issue tracker](https://github.com/TrustInsights/OpenList/issues)
 * Original author: chris@chrisdzombak.net

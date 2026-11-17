@@ -106,6 +106,19 @@ describe('formatTabs: round trip', () => {
     );
   });
 
+  it.each(carriers)(
+    '%s keeps only the tab URL when the title has a Unicode line separator and an address',
+    (format) => {
+      for (const separator of ['\u2028', '\u2029']) {
+        const hostile = { ...t, title: `See https://evil.example/x${separator}more` };
+        const entries = parseList(textOf(format, hostile)).entries;
+        expect(
+          entries.map((entry) => (entry.kind === 'url' ? urlKey(entry.url) : entry.term))
+        ).toEqual([urlKey(t.url)]);
+      }
+    }
+  );
+
   it.each(carriers)('%s survives an awkward title', (format) => {
     const awkward = { ...t, title: 'line1\nline2 🙂 \u202Eabc [x] (y) "z" <w>' };
     const entries = parseList(textOf(format, awkward)).entries;

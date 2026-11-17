@@ -76,7 +76,7 @@ describe('copyWindowTabs', () => {
     expect(chrome.offscreen.createDocument).not.toHaveBeenCalled();
     expect(chrome.runtime.sendMessage).not.toHaveBeenCalled();
     expect(chrome.action.setTitle).toHaveBeenCalledWith({
-      title: 'Open OpenList once to turn on copying.',
+      title: 'Open OpenList and press "Turn on clipboard detection" once to turn on copying.',
     });
     expect(chrome.action.setBadgeText).toHaveBeenCalledWith({ text: '!' });
   });

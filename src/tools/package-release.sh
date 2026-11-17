@@ -1,13 +1,14 @@
 #!/bin/sh
 # Package the built extension (dist/) into a Chrome Web Store zip in output/artifacts/.
 # Usage: sh src/tools/package-release.sh   (run "pnpm build" first; "pnpm package" does both)
-# Env: DIST_DIR (default dist), OUT_DIR (default output/artifacts), PACKAGE_JSON (default package.json)
+# Env: DIST_DIR (default dist), OUT_DIR (default output/artifacts), PACKAGE_JSON (default package.json), LICENSE_FILE (default LICENSE)
 set -eu
 
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 DIST_DIR=${DIST_DIR:-$ROOT/dist}
 OUT_DIR=${OUT_DIR:-$ROOT/output/artifacts}
 PACKAGE_JSON=${PACKAGE_JSON:-$ROOT/package.json}
+LICENSE_FILE=${LICENSE_FILE:-$ROOT/LICENSE}
 
 fail() {
   echo "error: $1" >&2
@@ -31,6 +32,9 @@ mkdir -p "$OUT_DIR"
 OUT="$OUT_DIR/openlist-$VERSION.zip"
 rm -f "$OUT"
 (cd "$DIST_DIR" && zip -X -q -r "$OUT" . -x '*.DS_Store' -x '*.map')
+
+[ -f "$LICENSE_FILE" ] || fail "the license file $LICENSE_FILE is missing."
+zip -X -q -j "$OUT" "$LICENSE_FILE"
 
 unzip -p "$OUT" manifest.json | jq -e '.manifest_version == 3' >/dev/null || fail "manifest.json is not at the root of the zip."
 unzip -Z1 "$OUT" | grep -q "^$WORKER\$" || fail "the service worker is not in the zip."

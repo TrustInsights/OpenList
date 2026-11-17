@@ -30,7 +30,7 @@ const COPY_ITEM =
  * thing on the line, so a title that holds an address gives no second page. Group 1 is the Title & URL target.
  * Group 2 is the Link target. A line that does not end this way keeps the rule "every address on the line".
  */
-const TITLE_ITEM = /^.*: (https?:\/\/\S+)$|^.* \((https?:\/\/.+)\)$/i;
+const TITLE_ITEM = /^.*: (https?:\/\/\S+)$|^.* \((https?:\/\/\S+)\)$/is;
 
 /** Punctuation that ends a sentence and does not belong to an address. */
 const TRAILING_PUNCTUATION = /[.,;:!?]$/;
@@ -67,10 +67,12 @@ function urlEntry(raw: string, line: number): Entry[] {
 /**
  * Makes a URL entry from a value in structured text. Text that is not a URL gives nothing.
  * @param value - The value of a JSON url, a CSV cell, or an HTML href.
+ * @param explicitOnly - True to accept only a value that starts with http:// or https://.
  * @returns The entry, or an empty array.
  */
-function structuredEntry(value: string): Entry[] {
+function structuredEntry(value: string, explicitOnly: boolean): Entry[] {
   const text = value.trim();
+  if (explicitOnly && !/^https?:\/\//i.test(text)) return [];
   return isProbablyUrl(text) ? urlEntry(text, -1) : [];
 }
 
@@ -96,17 +98,22 @@ function trimAddress(raw: string): string {
  * Reads one non-empty line: an item of Copy (Markdown, BBCode, Title & URL, Link), addresses, a site, or a search term.
  * @param line - The trimmed line text.
  * @param index - The zero-based line number.
+ * @param explicitOnly - True to drop sites and search terms, and keep only explicit http and https addresses.
  * @returns The entries of the line, before repeats are removed.
  */
-export function lineEntries(line: string, index: number): Entry[] {
+export function lineEntries(line: string, index: number, explicitOnly = false): Entry[] {
   const item = COPY_ITEM.exec(line);
   if (item !== null) return urlEntry(item[1] ?? item[2], index);
   const titled = TITLE_ITEM.exec(line);
-  if (titled !== null) return urlEntry(trimAddress(titled[1] ?? titled[2]), index);
+  if (titled !== null) {
+    const target = urlEntry(trimAddress(titled[1] ?? titled[2]), index);
+    if (target.length > 0) return target;
+  }
   const addresses = [...line.matchAll(ADDRESS)];
   if (addresses.length > 0) {
     return addresses.flatMap((match) => urlEntry(trimAddress(match[0]), index));
   }
+  if (explicitOnly) return [];
   if (isProbablyUrl(line)) return urlEntry(line, index);
   return [{ kind: 'search', term: line, line: index }];
 }
@@ -114,9 +121,10 @@ export function lineEntries(line: string, index: number): Entry[] {
 /**
  * Reads the text line by line. A blank line ends a group.
  * @param text - Normalized text.
+ * @param explicitOnly - True to keep only explicit http and https addresses.
  * @returns The groups of entries.
  */
-function lineGroups(text: string): Entry[][] {
+function lineGroups(text: string, explicitOnly: boolean): Entry[][] {
   const groups: Entry[][] = [];
   let current: Entry[] = [];
   text.split('\n').forEach((raw, index) => {
@@ -125,7 +133,7 @@ function lineGroups(text: string): Entry[][] {
       if (current.length > 0) groups.push(current);
       current = [];
     } else {
-      current.push(...lineEntries(line, index));
+      current.push(...lineEntries(line, index, explicitOnly));
     }
   });
   if (current.length > 0) groups.push(current);
@@ -155,31 +163,28 @@ function build(groups: Entry[][], structured: boolean): ParsedList {
 }
 
 /**
- * Finds the explicit http and https addresses in a text. A site such as example.com does not count.
+ * Finds the explicit http and https addresses in a text, with the same reading rules as the list: the
+ * Copy shapes take only their own address (a hostile title adds no page), and HTML text is decoded.
+ * A site such as example.com does not count.
  * @param text - Any text, for example the clipboard text.
  * @returns The unique addresses, upgraded and cleaned as the list does it, in order.
  */
 export function webAddresses(text: string): string[] {
-  const seen = new Set<string>();
-  const found: string[] = [];
-  for (const match of text.matchAll(ADDRESS)) {
-    const entry = urlEntry(trimAddress(match[0]), -1)[0];
-    if (entry === undefined || entry.kind !== 'url' || seen.has(urlKey(entry.url))) continue;
-    seen.add(urlKey(entry.url));
-    found.push(entry.url);
-  }
-  return found;
+  return parseList(text, true)
+    .entries.filter((entry): entry is Extract<Entry, { kind: 'url' }> => entry.kind === 'url')
+    .map((entry) => entry.url);
 }
 
 /**
  * Reads text into URL and search entries. It tries JSON, CSV, and HTML first, then reads line by line.
  * @param text - Pasted, copied, or typed text.
+ * @param explicitOnly - True to keep only explicit http and https addresses (no sites, no searches).
  * @returns The unique entries, the blank-line groups, and the structure flag.
  */
-export function parseList(text: string): ParsedList {
+export function parseList(text: string, explicitOnly = false): ParsedList {
   const normalized = text.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
   const values = structuredValues(normalized);
   return values === null
-    ? build(lineGroups(normalized), false)
-    : build([values.flatMap(structuredEntry)], true);
+    ? build(lineGroups(normalized, explicitOnly), false)
+    : build([values.flatMap((value) => structuredEntry(value, explicitOnly))], true);
 }

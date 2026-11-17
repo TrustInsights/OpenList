@@ -10,7 +10,7 @@ The store summary comes from the manifest description ("Summary from package"). 
 |-------|---------|----------|
 | Title | OpenList (from package) | No change |
 | Summary (from package, max 132) | Manage and open lists of URLs. Select URLs in any webpage or paste them to open in new tabs. Updated by TrustInsights.ai. | Open a list of URLs as tabs, or copy your open tabs as Markdown, CSV, JSON, and more. Updated by TrustInsights.ai. (114 characters) |
-| Description (max 16,000) | 200 characters, credits Chris Dzombak | The text below (4413 characters). It follows the layout of the Figured listing: story line, overview, key features, how it works, permissions, open source. |
+| Description (max 16,000) | 200 characters, credits Chris Dzombak | The text below (4537 characters). It follows the layout of the Figured listing: story line, overview, key features, how it works, permissions, open source. |
 | Category | Functionality & UI | No change |
 | Language | English (United States) | No change |
 | Screenshots | The old ones show the old popup | Three 1280x800 PNGs from `pnpm store-images`: `screenshot-1-open-list.png`, `screenshot-2-copy-tabs.png`, `screenshot-3-details.png` (in `output/store-images/`) |
@@ -33,7 +33,7 @@ Key Features
 🧠 Smart Defaults: The list starts with the tabs you highlighted, or a list of URLs you just copied, or your whole window. Your last copy format is remembered. A control you change is never changed back for you.
 📝 Ten Copy Formats: URL, Title, Title & URL, Markdown, BBCode, HTML, Link, CSV, JSON, and HTML table. Titles are escaped correctly in every format, and CSV cells that start like a spreadsheet formula are made safe. A one-line example shows what you will get before you copy.
 🪟 Pick Your Scope: Selected tabs, this tab, this window, or all windows. With all windows, a blank line separates the windows.
-⌨️ Copy Without the Popup: Press Alt+Shift+C, or use the toolbar icon's right-click menu, to copy this window's tabs in your remembered format. You can change the shortcut at chrome://extensions/shortcuts.
+⌨️ Copy Without the Popup: Press Alt+Shift+C, or use the toolbar icon's right-click menu, to copy this window's tabs in your remembered format. The first time, open the popup and click "Turn on clipboard detection" once so Chrome can ask for the clipboard permission. You can change the shortcut at chrome://extensions/shortcuts.
 🖱️ Right-Click to Open: Select URLs on any web page, right-click, and choose "Open selected URLs in new tabs".
 🔁 No Double Tabs: A URL that is already open in your window is skipped, and the status line tells you how many.
 📦 Big Lists, One Step at a Time: OpenList opens up to 20 tabs per click so your browser stays fast. The rest stay in the list, and the button reads "Open next 20 of 25".

@@ -6,6 +6,8 @@ import {
   requestClipboardPermission,
   writeClipboard,
 } from '@/utils/clipboard';
+import { urlKey } from '@/utils/extract-urls';
+import { formatTabs } from '@/utils/formatters';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const readText = vi.fn();
@@ -81,6 +83,49 @@ describe('readClipboardUrls', () => {
   it('does not count a site-like line as a web address (spec 7: http and https only)', async () => {
     readText.mockResolvedValue('example.com\nnode.js\nhttps://a.com\nhttps://b.com');
     expect(await readClipboardUrls()).toEqual(['https://a.com/', 'https://b.com/']);
+  });
+
+  const hostile = {
+    title: 'See https://evil.example/x for more',
+    url: 'https://example.com/a_(b)?x=1&y=2',
+    windowId: 1,
+    index: 0,
+    pinned: false,
+    active: true,
+    groupId: -1,
+  };
+
+  it.each(['Markdown', 'BBCode', 'Title & URL', 'Link'] as const)(
+    "reads only the tab address from OpenList's own %s output (a hostile title adds no page)",
+    async (format) => {
+      readText.mockResolvedValue(
+        formatTabs(format, [[hostile, { ...hostile, url: 'https://example.net/b' }]]).text
+      );
+      expect((await readClipboardUrls())?.map(urlKey)).toEqual([
+        urlKey('https://example.com/a_(b)?x=1&y=2'),
+        urlKey('https://example.net/b'),
+      ]);
+    }
+  );
+
+  it.each(['HTML', 'HTML table'] as const)(
+    "decodes the address in OpenList's own %s output",
+    async (format) => {
+      readText.mockResolvedValue(
+        formatTabs(format, [[hostile, { ...hostile, url: 'https://example.net/b?p=1&q=2' }]]).text
+      );
+      expect(await readClipboardUrls()).toEqual([
+        'https://example.com/a_(b)?x=1&y=2',
+        'https://example.net/b?p=1&q=2',
+      ]);
+    }
+  );
+
+  it('reads hostile text at the size limit in well under two seconds', async () => {
+    readText.mockResolvedValue(' (https://a'.repeat(90_000));
+    const started = performance.now();
+    await readClipboardUrls();
+    expect(performance.now() - started).toBeLessThan(2000);
   });
 
   it('keeps http for a local address', async () => {

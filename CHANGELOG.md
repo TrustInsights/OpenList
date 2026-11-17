@@ -4,12 +4,23 @@ All notable changes to OpenList are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [1.2.0] - 2026-11-17
+
+### Fixed (final review, 2026-11-17)
+
+- Clipboard detection reads text with the same rules as the list. A first draft of the 2026-11-17 clipboard fix scanned the raw text for addresses. That skipped the Copy shapes, so a tab title that held an address added a page again, and the `&amp;` in the `href` of OpenList's own HTML output was kept in the address. `webAddresses` now uses `parseList` with an explicit-only option. Tests: `readClipboardUrls` with OpenList's own Markdown, BBCode, Title & URL, Link, URL, HTML, and HTML table output.
+- The first-run hint on the toolbar title now names the button: "Open OpenList and press \"Turn on clipboard detection\" once to turn on copying." The popup hint under the button now says the button also lets the Alt+Shift+C shortcut copy. The README and the store listing say that the shortcut needs this one-time grant.
+- The release zip now contains the LICENSE file. The package tool stops if the file is missing.
+- Audit fixes (independent audit of the 2026-11-17 changes): the Link shape reads `\S+` so a typed line such as "Links (https://a.com, https://b.com)" keeps both addresses and prose never makes one false address; the shape pattern no longer takes quadratic time on hostile text (tests at 220 kB and at the clipboard size limit); a title with a Unicode line or paragraph separator (U+2028, U+2029) no longer gets past ruling 33; a short toolbar result no longer erases the permission hint, which comes back when the result ends; the popup hint is one line again, so the popup stays within 600 px with Details open; the hint no longer names a fixed shortcut key; the README links the project repository.
+
 ### Fixed (2026-11-17, owner rule: fix every known gap)
 
 - Round trip: "Title & URL" and "Link" lines now read back one page even when a tab title holds an address (ruling 33). Spec 6.3 holds for all nine formats that carry URLs.
 - Clipboard detection counts only `http://` and `https://` addresses, not site-like text (ruling 34).
 - Right-click "Open selected URLs": reads the selection like the popup, skips pages already open, removes repeats, opens at most 20, and shows the result on the toolbar icon (ruling 35).
-- The toolbar hint "Open OpenList once to turn on copying." stays until the permissions are granted (ruling 36).
+- The toolbar hint (it names the "Turn on clipboard detection" button) stays until the permissions are granted (ruling 36).
 - `package.json` has `"type": "module"`, and the configs use `import.meta.dirname`. The Vite warning about ESM syntax in a CommonJS package is gone (ruling 37).
 - Tests added: focus stays on the format control after a change, hover moves a control only for a fine pointer, reduced motion removes transitions and movement, and the service worker entry point registers every listener.
 
@@ -25,8 +36,6 @@ All notable changes to OpenList are listed here. The format follows [Keep a Chan
 - Round trip (spec 6.3): a Markdown or BBCode item whose tab title holds a web address read back as two pages. `lineEntries` now takes only the link target of the exact item shapes that Copy writes (ruling 32). Title & URL and Link stay open as carry-over 12 in docs/project-decisions.md.
 - Open (spec 5.3): a line that repeated an opened or skipped URL stayed in the list after Open. `remainingText` now removes it (ruling 32).
 - Tests: a hostile-title round trip for the seven formats that carry URLs and have an unambiguous shape, two extractor shape tests, and three repeat-line tests.
-
-## [1.2.0] - 2026-11-16
 
 ### Added (release, plan B task 15)
 

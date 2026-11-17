@@ -19,12 +19,12 @@ const CSV_HEADER = 'title,url,window,index,pinned,active';
 const FORMULA_START = /^[=+\-@\t\r]/;
 
 /**
- * Makes a title safe for a text format: each line break becomes one space.
+ * Makes a title safe for a text format: each line break (CR, LF, or the Unicode line and paragraph separators) becomes one space.
  * @param title - The tab title.
  * @returns The title on one line.
  */
 function oneLine(title: string): string {
-  return title.replace(/\r\n|\r|\n/g, ' ');
+  return title.replace(/\r\n|[\r\n\u2028\u2029]/g, ' ');
 }
 
 /**

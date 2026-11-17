@@ -14,7 +14,7 @@ interface ClipboardPromptProps {
 export function ClipboardPrompt({ onEnable, onDismiss }: ClipboardPromptProps): React.JSX.Element {
   return (
     <div className="clipboard-prompt">
-      <p className="hint">Finds a copied URL list. The text is never saved or sent.</p>
+      <p className="hint">Finds copied URLs and enables the copy shortcut. Nothing is sent.</p>
       <div className="prompt-buttons">
         <button type="button" className="btn-plain" onClick={onEnable}>
           Turn on clipboard detection

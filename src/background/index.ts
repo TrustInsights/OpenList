@@ -15,7 +15,7 @@ chrome.commands.onCommand.addListener((name) => {
 
 chrome.contextMenus.onClicked.addListener(handleContextMenuClick);
 
-// The toolbar hint "Open OpenList once to turn on copying." stays until the user grants the permissions.
+// The toolbar hint (it names the "Turn on clipboard detection" button) stays until the user grants the permissions.
 chrome.permissions.onAdded.addListener(() => void clearFeedback());
 
 chrome.runtime.onMessage.addListener(handleMessage);

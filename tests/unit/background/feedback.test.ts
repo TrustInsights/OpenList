@@ -12,7 +12,8 @@ describe('showResult', () => {
     vi.useFakeTimers();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    await clearFeedback();
     vi.useRealTimers();
     vi.restoreAllMocks();
   });
@@ -27,7 +28,11 @@ describe('showResult', () => {
   });
 
   it('keeps a sticky message after 3000 ms and clears it when clearFeedback runs', async () => {
-    await showResult('Open OpenList once to turn on copying.', false, true);
+    await showResult(
+      'Open OpenList and press "Turn on clipboard detection" once to turn on copying.',
+      false,
+      true
+    );
     await vi.advanceTimersByTimeAsync(10_000);
     expect(chrome.action.setBadgeText).not.toHaveBeenCalledWith({ text: '' });
 
@@ -36,9 +41,41 @@ describe('showResult', () => {
     expect(chrome.action.setTitle).toHaveBeenLastCalledWith({ title: DEFAULT_TITLE });
   });
 
+  it('gives the icon back to the sticky message when a short result ends', async () => {
+    const hint = 'Open OpenList and press "Turn on clipboard detection" once to turn on copying.';
+    await showResult(hint, false, true);
+    await showResult('Opened 1.', true);
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(chrome.action.setTitle).toHaveBeenLastCalledWith({ title: hint });
+    expect(chrome.action.setBadgeText).toHaveBeenLastCalledWith({ text: '!' });
+    expect(chrome.action.setBadgeText).not.toHaveBeenCalledWith({ text: '' });
+  });
+
+  it('rests after a short result once clearFeedback has forgotten the sticky message', async () => {
+    await showResult('hint', false, true);
+    await clearFeedback();
+    await showResult('Opened 1.', true);
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(chrome.action.setBadgeText).toHaveBeenLastCalledWith({ text: '' });
+    expect(chrome.action.setTitle).toHaveBeenLastCalledWith({ title: DEFAULT_TITLE });
+  });
+
+  it('logs an error and does not reject when the sticky message cannot come back', async () => {
+    const error = vi.spyOn(logger, 'error').mockImplementation(() => undefined);
+    await showResult('hint', false, true);
+    await showResult('Opened 1.', true);
+    vi.mocked(chrome.action.setTitle).mockRejectedValueOnce(new Error('gone'));
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(error).toHaveBeenCalledWith('Feedback restore failed', { error: 'gone' });
+  });
+
   it('cancels the timer of an earlier message when a sticky message follows', async () => {
     await showResult('Copied 3 as URL.', true);
-    await showResult('Open OpenList once to turn on copying.', false, true);
+    await showResult(
+      'Open OpenList and press "Turn on clipboard detection" once to turn on copying.',
+      false,
+      true
+    );
     await vi.advanceTimersByTimeAsync(10_000);
     expect(chrome.action.setBadgeText).not.toHaveBeenCalledWith({ text: '' });
   });

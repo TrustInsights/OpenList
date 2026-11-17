@@ -10,6 +10,7 @@ const BASE = join(ROOT, 'temp/package-release-test');
 const DIST = join(BASE, 'dist');
 const OUT = join(BASE, 'out');
 const PKG = join(BASE, 'package.json');
+const LICENSE_FILE = join(BASE, 'LICENSE');
 
 /** Writes a fake manifest into the fake dist folder. @param version - Version text. */
 function writeManifest(version: string): void {
@@ -22,7 +23,7 @@ function writeManifest(version: string): void {
 /** Runs the packaging script against the fake folders. @returns The script output. */
 function run(): string {
   return execFileSync('sh', [SCRIPT], {
-    env: { ...process.env, DIST_DIR: DIST, OUT_DIR: OUT, PACKAGE_JSON: PKG },
+    env: { ...process.env, DIST_DIR: DIST, OUT_DIR: OUT, PACKAGE_JSON: PKG, LICENSE_FILE },
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -40,6 +41,7 @@ describe('package-release.sh', () => {
     writeManifest('1.2.3');
     writeFileSync(join(DIST, 'sw.js'), 'export {};');
     writeFileSync(PKG, JSON.stringify({ version: '1.2.3' }));
+    writeFileSync(LICENSE_FILE, 'MIT');
   });
 
   it('creates openlist-<version>.zip with the manifest at the root', () => {
@@ -51,6 +53,11 @@ describe('package-release.sh', () => {
     );
   });
 
+  it('adds the LICENSE file of the project to the zip', () => {
+    run();
+    expect(listZip(join(OUT, 'openlist-1.2.3.zip'))).toContain('LICENSE');
+  });
+
   it('leaves out .DS_Store files and source maps', () => {
     writeFileSync(join(DIST, '.DS_Store'), 'x');
     writeFileSync(join(DIST, 'sw.js.map'), '{}');
@@ -58,6 +65,11 @@ describe('package-release.sh', () => {
     const names = listZip(join(OUT, 'openlist-1.2.3.zip'));
     expect(names.some((n) => n.endsWith('.DS_Store'))).toBe(false);
     expect(names.some((n) => n.endsWith('.map'))).toBe(false);
+  });
+
+  it('fails when the license file is missing', () => {
+    rmSync(LICENSE_FILE);
+    expect(() => run()).toThrow(/license file .* is missing/);
   });
 
   it('fails when the manifest is missing', () => {
