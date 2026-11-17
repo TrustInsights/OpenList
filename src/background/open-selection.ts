@@ -3,7 +3,7 @@
 import { showResult } from '@/background/feedback';
 import { openList } from '@/background/open-list';
 import { CONFIG } from '@/schemas/config';
-import { urlKey } from '@/utils/extract-urls';
+import { parseList, urlKey } from '@/utils/extract-urls';
 import { type OpenPlan, entryUrl, planOpen } from '@/utils/open-plan';
 
 /**
@@ -40,7 +40,7 @@ export async function openSelection(text: string, windowId?: number): Promise<vo
       return url ? [urlKey(url)] : [];
     })
   );
-  const plan = planOpen(text, open, CONFIG.MAX_TABS);
+  const plan = planOpen(parseList(text).entries, open, CONFIG.MAX_TABS);
   if (plan.batch.length === 0) {
     const allOpen = plan.skipped.length > 0;
     await showResult(

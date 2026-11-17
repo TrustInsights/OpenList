@@ -31,7 +31,7 @@ export function stubClipboard(): ClipboardStub {
 }
 
 /** A promise that the test settles by hand. */
-export interface Deferred<T> {
+interface Deferred<T> {
   promise: Promise<T>;
   resolve: (value: T) => void;
 }

@@ -12,7 +12,6 @@ function reply(opened: string[], errors: string[] = []): unknown {
     results: {
       successful: opened.length,
       failed: errors.length,
-      totalTime: 5,
       errors,
       opened,
     },

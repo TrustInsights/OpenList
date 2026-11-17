@@ -26,7 +26,6 @@ function reply(opened: string[]): unknown {
     results: {
       successful: opened.length,
       failed: 0,
-      totalTime: 5,
       errors: [],
       opened,
     },

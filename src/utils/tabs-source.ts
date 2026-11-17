@@ -5,7 +5,7 @@ import { urlKey } from '@/utils/extract-urls';
 import { isProbablyUrl } from '@/utils/urls';
 
 /** Addresses of tabs that never belong in a list (compared without a trailing slash). */
-const JUNK_ADDRESSES = new Set(['chrome://newtab', 'chrome://new-tab-page', 'about:blank']);
+const JUNK_ADDRESSES = new Set(['chrome://newtab', 'chrome://new-tab-page']);
 
 /** The tabs of the current window, the other sources, and every known tab. */
 export interface LoadedTabs {

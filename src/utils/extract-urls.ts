@@ -1,7 +1,7 @@
 // URL extractor: turns pasted or copied text into URL and search entries
 
 import { structuredValues } from '@/utils/structured-values';
-import { isLocalHost, isProbablyUrl, sanitizeUrl } from '@/utils/urls';
+import { isProbablyUrl, sanitizeUrl, upgradeHttp } from '@/utils/urls';
 
 /** One item of the list: a page address or a search term. `line` is the zero-based source line, or -1 for structured text. */
 export type Entry =
@@ -45,9 +45,7 @@ const TRAILING_PUNCTUATION = /[.,;:!?]$/;
  */
 export function urlKey(url: string): string {
   try {
-    const parsed = new URL(url.replace(/%28/g, '(').replace(/%29/g, ')'));
-    if (parsed.protocol === 'http:' && !isLocalHost(parsed.hostname)) parsed.protocol = 'https:';
-    return parsed.href;
+    return upgradeHttp(new URL(url.replace(/%28/g, '(').replace(/%29/g, ')'))).href;
   } catch {
     return url;
   }
@@ -176,13 +174,22 @@ export function webAddresses(text: string): string[] {
 }
 
 /**
+ * Removes a leading byte-order mark and turns CR and CRLF line breaks into LF.
+ * @param text - Raw text.
+ * @returns The normalized text.
+ */
+export function normalizeText(text: string): string {
+  return text.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+}
+
+/**
  * Reads text into URL and search entries. It tries JSON, CSV, and HTML first, then reads line by line.
  * @param text - Pasted, copied, or typed text.
  * @param explicitOnly - True to keep only explicit http and https addresses (no sites, no searches).
  * @returns The unique entries, the blank-line groups, and the structure flag.
  */
 export function parseList(text: string, explicitOnly = false): ParsedList {
-  const normalized = text.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+  const normalized = normalizeText(text);
   const values = structuredValues(normalized);
   return values === null
     ? build(lineGroups(normalized, explicitOnly), false)

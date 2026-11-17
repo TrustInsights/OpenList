@@ -20,7 +20,7 @@ OpenList is not called compliant with WCAG 2.1 AA. The owner must do the items m
 | Item | Result | Known gap | Test |
 |------|--------|-----------|------|
 | Keyboard only: every control is reachable in a logical order | PASS (agent) | None found. | `a11y.spec.ts`: "Tab visits the list, From, Open, Copy, Copy as, Details, and the footer link in this order" and "the clipboard buttons sit between Copy as and Details while the prompt shows" |
-| Keyboard only: Ctrl+Enter and Cmd+Enter open the list | PASS (agent) | None found. | `keyboard.spec.ts`: "Control+Enter opens the URLs of the list", "Meta+Enter opens the URLs of the list" |
+| Keyboard only: Ctrl+Enter and Cmd+Enter open the list | PASS (agent) | None found. | `open.spec.ts`: Control+Enter on pasted URLs; `keyboard.spec.ts`: "Meta+Enter opens the URLs of the list" |
 | Keyboard only: Enter and Space run the buttons and the Details control, and a typed letter picks a format | PASS (agent) | On macOS an arrow key only opens the native menu of a select. The test uses type-ahead, which works with the menu closed. Arrow keys on Windows are not tested. | `keyboard-only.spec.ts`: "Tab, Enter, Space, and type-ahead reach and run every control with no pointer" |
 | Focus is visible | PASS (agent) | None found. | `a11y.spec.ts`: "every focused control shows a solid 2 px accent outline with a 2 px offset" (light and dark) |
 | VoiceOver on macOS: labels | NOT DONE (needs the owner) | Not run. The accessibility tree exposes the names, which is not the same as VoiceOver speech. | `keyboard-only.spec.ts`: "the list and the error box expose their names, roles, and links to assistive technology" |

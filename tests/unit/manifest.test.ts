@@ -26,7 +26,7 @@ describe('manifest', () => {
   it('declares one copy-window command with the suggested shortcut and no action override', () => {
     expect(Object.keys(manifest.commands)).toEqual(['copy-window']);
     expect(manifest.commands['copy-window']).toEqual({
-      suggested_key: { default: 'Alt+Shift+C', mac: 'Alt+Shift+C' },
+      suggested_key: { default: 'Alt+Shift+C' },
       description: "Copy this window's tabs",
     });
     expect(manifest.commands).not.toHaveProperty('_execute_action');

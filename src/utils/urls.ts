@@ -1,7 +1,16 @@
 // URL validation and sanitization utilities
 
-import { BLOCKED_PROTOCOLS } from '@/schemas/urls';
 import { logger } from '@/utils/logger';
+
+/** Protocols blocked for security reasons. */
+const BLOCKED_PROTOCOLS = [
+  'javascript:',
+  'data:',
+  'vbscript:',
+  'file:',
+  'about:',
+  'blob:',
+] as const;
 
 /** Protocols accepted as valid URL prefixes (non-exhaustive; bare domains are also accepted). Chrome 95 removed ftp:. */
 const ALLOWED_PROTOCOLS = ['https:', 'http:', 'chrome:', 'chrome-extension:'] as const;
@@ -18,9 +27,7 @@ const SCHEME_PREFIX = /^[a-z][a-z0-9+.-]*:\/\//i;
  * @param input - The string to test
  * @returns true if the string looks like a URL
  */
-export function isProbablyUrl(input: unknown): boolean {
-  if (!input || typeof input !== 'string') return false;
-
+export function isProbablyUrl(input: string): boolean {
   const lower = input.trim().toLowerCase();
 
   if (BLOCKED_PROTOCOLS.some((p) => lower.startsWith(p))) return false;
@@ -32,17 +39,26 @@ export function isProbablyUrl(input: unknown): boolean {
 
 /**
  * Tells whether a host is a local address: localhost, 127.0.0.1, [::1], or a name that ends in .local.
- * Open leaves http as typed for these hosts, because a local server seldom speaks https.
  * @param hostname - The hostname of a parsed URL (an IPv6 address keeps its brackets).
  * @returns true for a local host
  */
-export function isLocalHost(hostname: string): boolean {
+function isLocalHost(hostname: string): boolean {
   return (
     hostname === 'localhost' ||
     hostname === '127.0.0.1' ||
     hostname === '[::1]' ||
     hostname.endsWith('.local')
   );
+}
+
+/**
+ * Upgrades an http address to https for websites (ruling 30). Local hosts keep http, because a local server seldom speaks https.
+ * @param parsed - The parsed URL. The function changes it in place.
+ * @returns The same URL object
+ */
+export function upgradeHttp(parsed: URL): URL {
+  if (parsed.protocol === 'http:' && !isLocalHost(parsed.hostname)) parsed.protocol = 'https:';
+  return parsed;
 }
 
 /**
@@ -67,9 +83,5 @@ export function sanitizeUrl(url: string): string | null {
     return null;
   }
 
-  if (parsed.protocol === 'http:' && !isLocalHost(parsed.hostname)) {
-    parsed.protocol = 'https:';
-  }
-
-  return parsed.href;
+  return upgradeHttp(parsed).href;
 }

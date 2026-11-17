@@ -36,7 +36,7 @@ export function handleMessage(
     } catch (err: unknown) {
       const message = toErrorMessage(err);
       logger.error('Error processing URL list', { error: message });
-      sendResponse({ status: 'error', message, details: 'Failed to process URLs' });
+      sendResponse({ status: 'error', message });
     }
   };
   void run();

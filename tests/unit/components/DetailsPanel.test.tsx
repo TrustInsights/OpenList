@@ -1,10 +1,12 @@
 // Unit tests for components/DetailsPanel.tsx
 
 import { DetailsPanel } from '@/components/DetailsPanel';
-import type { Totals } from '@/types';
+import type { Totals } from '@/schemas/metrics';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe } from 'vitest-axe';
+
+const noop = (): void => undefined;
 
 const TOTALS: Totals = { tabsOpened: 5, tabsFailed: 1, urlsProcessed: 6 };
 
@@ -20,7 +22,7 @@ function textUnder(term: string): string {
 describe('DetailsPanel', () => {
   it('has no accessibility violations when closed and when open', async () => {
     const { container } = render(
-      <DetailsPanel totals={TOTALS} openSince={OPEN_SINCE} onRefresh={() => undefined}>
+      <DetailsPanel totals={TOTALS} openSince={OPEN_SINCE} onRefresh={noop} onToggle={noop}>
         <p>child</p>
       </DetailsPanel>
     );
@@ -31,7 +33,7 @@ describe('DetailsPanel', () => {
 
   it('is closed by default', () => {
     const { container } = render(
-      <DetailsPanel totals={TOTALS} openSince={OPEN_SINCE} onRefresh={() => undefined} />
+      <DetailsPanel totals={TOTALS} openSince={OPEN_SINCE} onRefresh={noop} onToggle={noop} />
     );
     const details = container.querySelector('details');
     expect(details).not.toBeNull();
@@ -40,7 +42,9 @@ describe('DetailsPanel', () => {
   });
 
   it('shows the four values with their labels', () => {
-    render(<DetailsPanel totals={TOTALS} openSince={OPEN_SINCE} onRefresh={() => undefined} />);
+    render(
+      <DetailsPanel totals={TOTALS} openSince={OPEN_SINCE} onRefresh={noop} onToggle={noop} />
+    );
     expect(textUnder('Success rate')).toBe('83.3%');
     expect(textUnder('Tabs opened')).toBe('5');
     expect(textUnder('Errors')).toBe('1');
@@ -54,7 +58,8 @@ describe('DetailsPanel', () => {
       <DetailsPanel
         totals={{ ...TOTALS, tabsOpened: 0, tabsFailed: 0, urlsProcessed: 0 }}
         openSince={OPEN_SINCE}
-        onRefresh={() => undefined}
+        onRefresh={noop}
+        onToggle={noop}
       />
     );
     expect(textUnder('Success rate')).toBe('100%');
@@ -62,33 +67,31 @@ describe('DetailsPanel', () => {
       <DetailsPanel
         totals={{ ...TOTALS, tabsOpened: 4, tabsFailed: 0, urlsProcessed: 4 }}
         openSince={OPEN_SINCE}
-        onRefresh={() => undefined}
+        onRefresh={noop}
+        onToggle={noop}
       />
     );
     expect(textUnder('Success rate')).toBe('100%');
   });
 
   it('shows Unknown when the session start is not known', () => {
-    render(<DetailsPanel totals={TOTALS} openSince={0} onRefresh={() => undefined} />);
+    render(<DetailsPanel totals={TOTALS} openSince={0} onRefresh={noop} onToggle={noop} />);
     expect(textUnder('Open since')).toBe('Unknown');
   });
 
   it('calls onRefresh when Refresh is clicked', async () => {
     const onRefresh = vi.fn();
-    render(<DetailsPanel totals={TOTALS} openSince={OPEN_SINCE} onRefresh={onRefresh} />);
+    render(
+      <DetailsPanel totals={TOTALS} openSince={OPEN_SINCE} onRefresh={onRefresh} onToggle={noop} />
+    );
     await userEvent.setup().click(screen.getByRole('button', { name: 'Refresh', hidden: true }));
     expect(onRefresh).toHaveBeenCalledTimes(1);
   });
 
-  it('reports each open and close to onToggle, and works without it', async () => {
+  it('reports each open and close to onToggle', async () => {
     const onToggle = vi.fn();
     const { container } = render(
-      <DetailsPanel
-        totals={TOTALS}
-        openSince={OPEN_SINCE}
-        onRefresh={() => undefined}
-        onToggle={onToggle}
-      />
+      <DetailsPanel totals={TOTALS} openSince={OPEN_SINCE} onRefresh={noop} onToggle={onToggle} />
     );
     const details = container.querySelector('details') as HTMLDetailsElement;
     details.open = true;
@@ -98,20 +101,9 @@ describe('DetailsPanel', () => {
     expect(onToggle).toHaveBeenCalledTimes(2);
   });
 
-  it('ignores a toggle when no onToggle is given', async () => {
-    const { container } = render(
-      <DetailsPanel totals={TOTALS} openSince={OPEN_SINCE} onRefresh={() => undefined} />
-    );
-    const details = container.querySelector('details') as HTMLDetailsElement;
-    details.open = true;
-    await waitFor(() => expect(details).toHaveAttribute('open'));
-    details.dispatchEvent(new Event('toggle'));
-    expect(details.open).toBe(true);
-  });
-
   it('renders its children', () => {
     render(
-      <DetailsPanel totals={TOTALS} openSince={OPEN_SINCE} onRefresh={() => undefined}>
+      <DetailsPanel totals={TOTALS} openSince={OPEN_SINCE} onRefresh={noop} onToggle={noop}>
         <p>inside details</p>
       </DetailsPanel>
     );

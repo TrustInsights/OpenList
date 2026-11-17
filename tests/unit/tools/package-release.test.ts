@@ -2,9 +2,9 @@
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { ROOT } from '@tests/helpers/source-scan';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-const ROOT = process.cwd();
 const SCRIPT = join(ROOT, 'src/tools/package-release.sh');
 const BASE = join(ROOT, 'temp/package-release-test');
 const DIST = join(BASE, 'dist');

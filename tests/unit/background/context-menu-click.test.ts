@@ -21,7 +21,6 @@ describe('handleContextMenuClick', () => {
     openListSpy = vi.spyOn(openListModule, 'openList').mockResolvedValue({
       successful: 1,
       failed: 0,
-      totalTime: 0,
       errors: [],
       opened: [],
     });

@@ -1,6 +1,6 @@
 // Popup Details section: the totals, the session start, a Refresh button, and extra content
 
-import type { Totals } from '@/types';
+import type { Totals } from '@/schemas/metrics';
 import type { ReactNode } from 'react';
 
 /** What the panel needs from the popup. */
@@ -9,7 +9,7 @@ interface DetailsPanelProps {
   openSince: number;
   onRefresh: () => void;
   /** Called each time the user opens or closes the section, with the new state. */
-  onToggle?: (open: boolean) => void;
+  onToggle: (open: boolean) => void;
   children?: ReactNode;
 }
 
@@ -51,7 +51,7 @@ export function DetailsPanel({
   children,
 }: DetailsPanelProps): React.JSX.Element {
   return (
-    <details className="details" onToggle={(event) => onToggle?.(event.currentTarget.open)}>
+    <details className="details" onToggle={(event) => onToggle(event.currentTarget.open)}>
       <summary>Details</summary>
       <dl className="metrics">
         <div>

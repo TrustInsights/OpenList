@@ -1,7 +1,6 @@
 // Structured text readers: pull URL values out of JSON, CSV, and HTML that Copy writes
 
-/** The first line that the CSV format of Copy writes. */
-const CSV_HEADER = 'title,url,window,index,pinned,active';
+import { CSV_HEADER } from '@/utils/formatters';
 
 /** The href value of an HTML link, in double or single quotes. */
 const HREF = /href\s*=\s*(?:"([^"]*)"|'([^']*)')/gi;

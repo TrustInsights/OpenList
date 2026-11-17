@@ -99,7 +99,10 @@ export function useListActions({ text, setText, known, format }: ListActionsArgs
   }, [refreshOpenKeys]);
 
   const parsed = useMemo(() => parseList(text), [text]);
-  const plan = useMemo(() => planOpen(text, openKeys, CONFIG.MAX_TABS), [text, openKeys]);
+  const plan = useMemo(
+    () => planOpen(parsed.entries, openKeys, CONFIG.MAX_TABS),
+    [parsed, openKeys]
+  );
   const urlGroups = parsed.groups
     .map((group) => group.flatMap((entry) => (entry.kind === 'url' ? [entry.url] : [])))
     .filter((group) => group.length > 0);

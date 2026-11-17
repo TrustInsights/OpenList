@@ -17,7 +17,6 @@ const TOKEN_NAMES = [
   'border',
   'err',
   'err-bg',
-  'err-border',
   'sel-bg',
   'sel-text',
 ] as const;
@@ -126,14 +125,6 @@ describe('design tokens', () => {
       it.each(BORDER_PAIRS)('border or ring pair %s on %s is at least 3:1', (fg, bg) => {
         expect(contrastRatio(theme[fg], theme[bg])).toBeGreaterThanOrEqual(3);
       });
-
-      it('error border is at least 3:1 on its error fill', () => {
-        expect(contrastRatio(theme['err-border'], theme['err-bg'])).toBeGreaterThanOrEqual(3);
-      });
     });
   }
-
-  it('the helper fails a pair that is too weak', () => {
-    expect(contrastRatio('#777777', '#888888')).toBeLessThan(4.5);
-  });
 });

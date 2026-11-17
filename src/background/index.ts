@@ -3,11 +3,11 @@
 import { handleContextMenuClick } from '@/background/context-menu';
 import { copyWindowTabs } from '@/background/copy-window';
 import { clearFeedback } from '@/background/feedback';
-import { handleInstalled, handleStartup } from '@/background/lifecycle';
+import { handleLifecycle } from '@/background/lifecycle';
 import { handleMessage } from '@/background/messages';
 
-chrome.runtime.onInstalled.addListener(handleInstalled);
-chrome.runtime.onStartup.addListener(handleStartup);
+chrome.runtime.onInstalled.addListener(handleLifecycle);
+chrome.runtime.onStartup.addListener(handleLifecycle);
 
 chrome.commands.onCommand.addListener((name) => {
   if (name === 'copy-window') void copyWindowTabs();

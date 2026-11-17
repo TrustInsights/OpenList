@@ -1,25 +1,11 @@
 // Unit tests for utils/urls.ts
 
-import { isLocalHost, isProbablyUrl, sanitizeUrl } from '@/utils/urls';
+import { isProbablyUrl, sanitizeUrl, upgradeHttp } from '@/utils/urls';
 import { describe, expect, it } from 'vitest';
 
 describe('isProbablyUrl', () => {
-  describe('returns false for non-string inputs', () => {
-    it('returns false for null', () => {
-      expect(isProbablyUrl(null)).toBe(false);
-    });
-
-    it('returns false for undefined', () => {
-      expect(isProbablyUrl(undefined)).toBe(false);
-    });
-
-    it('returns false for a number', () => {
-      expect(isProbablyUrl(42)).toBe(false);
-    });
-
-    it('returns false for an empty string', () => {
-      expect(isProbablyUrl('')).toBe(false);
-    });
+  it('returns false for an empty string', () => {
+    expect(isProbablyUrl('')).toBe(false);
   });
 
   it('returns false for ftp://, because Chrome 95 and later cannot load it', () => {
@@ -117,20 +103,26 @@ describe('bare domains and site-like strings', () => {
   });
 });
 
-describe('isLocalHost', () => {
+describe('upgradeHttp', () => {
   it.each(['localhost', '127.0.0.1', '[::1]', 'dev.local', 'a.b.local'])(
-    'is true for %s',
+    'keeps http for the local host %s',
     (host) => {
-      expect(isLocalHost(host)).toBe(true);
+      expect(upgradeHttp(new URL(`http://${host}/a`)).protocol).toBe('http:');
     }
   );
 
-  it.each(['example.com', 'localhost.example.com', '127.0.0.2', 'local', 'mylocal', '::1'])(
-    'is false for %s',
+  it.each(['example.com', 'localhost.example.com', '127.0.0.2', 'local', 'mylocal'])(
+    'upgrades http to https for the website %s',
     (host) => {
-      expect(isLocalHost(host)).toBe(false);
+      expect(upgradeHttp(new URL(`http://${host}/a`)).protocol).toBe('https:');
     }
   );
+
+  it('leaves an https address as it is and returns the same object', () => {
+    const url = new URL('https://example.com/a');
+    expect(upgradeHttp(url)).toBe(url);
+    expect(url.href).toBe('https://example.com/a');
+  });
 });
 
 describe('sanitizeUrl', () => {

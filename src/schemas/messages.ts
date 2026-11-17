@@ -33,9 +33,11 @@ export const OpenListResponseSchema = z.object({
   results: z.object({
     successful: z.number().int().min(0),
     failed: z.number().int().min(0),
-    totalTime: z.number().min(0),
     errors: z.array(z.string()),
     /** The URLs that opened a tab. */
     opened: z.array(z.string()),
   }),
 });
+
+/** Reply of openList: counts, error texts, and `opened` (the URLs that opened a tab). */
+export type OpenListResult = z.infer<typeof OpenListResponseSchema>['results'];

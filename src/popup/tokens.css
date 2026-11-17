@@ -10,7 +10,6 @@
   --border: #767676;
   --err: #b3261e;
   --err-bg: #fce8e6;
-  --err-border: #b3261e;
   --sel-bg: #d3e3fd;
   --sel-text: #041e49;
 }
@@ -27,7 +26,6 @@
     --border: #8e918f;
     --err: #f9b4ae;
     --err-bg: #402022;
-    --err-border: #f9b4ae;
     --sel-bg: #2f4468;
     --sel-text: #d3e3fd;
   }

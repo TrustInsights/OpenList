@@ -1,6 +1,6 @@
 // Open planner: splits a list into the batch to open now, the entries already open, and the entries that wait
 
-import { type Entry, lineEntries, parseList, urlKey } from '@/utils/extract-urls';
+import { type Entry, lineEntries, normalizeText, urlKey } from '@/utils/extract-urls';
 
 /** What one Open click does with the list. */
 export interface OpenPlan {
@@ -35,15 +35,19 @@ export function entryUrl(entry: Entry): string {
 /**
  * Plans one Open click. URLs already open are skipped. The first `cap` of the rest open now.
  * A search entry is never "open".
- * @param text - The list text.
+ * @param entries - The parsed entries of the list (`parseList(text).entries`).
  * @param openKeys - The urlKey of every URL open in the current window.
  * @param cap - The most tabs one click opens.
  * @returns The batch, the skipped entries, and the waiting entries.
  */
-export function planOpen(text: string, openKeys: ReadonlySet<string>, cap: number): OpenPlan {
+export function planOpen(
+  entries: readonly Entry[],
+  openKeys: ReadonlySet<string>,
+  cap: number
+): OpenPlan {
   const skipped: Entry[] = [];
   const rest: Entry[] = [];
-  for (const entry of parseList(text).entries) {
+  for (const entry of entries) {
     (entry.kind === 'url' && openKeys.has(urlKey(entry.url)) ? skipped : rest).push(entry);
   }
   return { batch: rest.slice(0, cap), skipped, waiting: rest.slice(cap) };
@@ -94,9 +98,7 @@ export function remainingText(text: string, plan: OpenPlan, opened: readonly Ent
   const done = [...opened, ...plan.skipped];
   const finished = new Set(done.map((entry) => entry.line));
   const doneKeys = new Set(done.map(entryKey));
-  return text
-    .replace(/^\uFEFF/, '')
-    .replace(/\r\n?/g, '\n')
+  return normalizeText(text)
     .split('\n')
     .filter((line, index) => {
       if (kept.has(index)) return true;

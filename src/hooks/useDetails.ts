@@ -1,7 +1,6 @@
 // Hook that reads the Details totals and the session start once, and again on request
 
-import { DEFAULT_TOTALS } from '@/schemas/metrics';
-import type { Totals } from '@/types';
+import { DEFAULT_TOTALS, type Totals } from '@/schemas/metrics';
 import { getOpenSince, getTotals } from '@/utils/metrics-store';
 import { useCallback, useEffect, useState } from 'react';
 

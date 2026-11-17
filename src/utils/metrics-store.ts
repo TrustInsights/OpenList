@@ -1,8 +1,7 @@
 // Details totals in local storage and the session start time in session storage
 
-import { DEFAULT_TOTALS, TotalsSchema } from '@/schemas/metrics';
+import { DEFAULT_TOTALS, type Totals, TotalsSchema } from '@/schemas/metrics';
 import { z } from '@/schemas/zod';
-import type { Totals } from '@/types';
 
 const TOTALS_KEY = 'totals';
 const OPEN_SINCE_KEY = 'openSince';
@@ -42,14 +41,11 @@ export async function getTotals(): Promise<Totals> {
  * @param delta - Counts to add. An omitted field adds 0
  * @returns A promise that resolves when the new totals are saved
  */
-export function addTotals(
-  delta: Partial<Pick<Totals, 'tabsOpened' | 'tabsFailed' | 'urlsProcessed'>>
-): Promise<void> {
+export function addTotals(delta: Partial<Totals>): Promise<void> {
   return enqueue(async () => {
     const totals = await getTotals();
     await chrome.storage.local.set({
       [TOTALS_KEY]: {
-        ...totals,
         tabsOpened: totals.tabsOpened + (delta.tabsOpened ?? 0),
         tabsFailed: totals.tabsFailed + (delta.tabsFailed ?? 0),
         urlsProcessed: totals.urlsProcessed + (delta.urlsProcessed ?? 0),

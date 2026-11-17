@@ -18,7 +18,6 @@ describe('openSelection', () => {
     openListSpy = vi.spyOn(openListModule, 'openList').mockImplementation(async (urls) => ({
       successful: urls.length,
       failed: 0,
-      totalTime: 0,
       errors: [],
       opened: [...urls],
     }));
@@ -95,7 +94,6 @@ describe('openSelection', () => {
     openListSpy.mockResolvedValue({
       successful: 1,
       failed: 1,
-      totalTime: 0,
       errors: ['x'],
       opened: [],
     });

@@ -22,14 +22,13 @@ const COPY_WINDOW_ITEM: chrome.contextMenus.CreateProperties = {
 };
 
 /**
- * Creates one context menu item. The Chrome create call reports failure
- * through chrome.runtime.lastError in its callback, not through a promise.
- * @param props - The menu item properties
- * @returns A promise that resolves when Chrome creates the item and rejects on lastError
+ * Wraps a Chrome call that reports failure through chrome.runtime.lastError in its callback, not through a promise.
+ * @param call - Starts the Chrome call and passes it the callback
+ * @returns A promise that resolves when Chrome calls back and rejects on lastError
  */
-function createMenuItem(props: chrome.contextMenus.CreateProperties): Promise<void> {
+function viaCallback(call: (done: () => void) => void): Promise<void> {
   return new Promise((resolve, reject) => {
-    chrome.contextMenus.create(props, () => {
+    call(() => {
       const lastError = chrome.runtime.lastError;
       if (lastError) {
         reject(new Error(lastError.message));
@@ -41,20 +40,20 @@ function createMenuItem(props: chrome.contextMenus.CreateProperties): Promise<vo
 }
 
 /**
+ * Creates one context menu item.
+ * @param props - The menu item properties
+ * @returns A promise that resolves when Chrome creates the item and rejects on lastError
+ */
+function createMenuItem(props: chrome.contextMenus.CreateProperties): Promise<void> {
+  return viaCallback((done) => chrome.contextMenus.create(props, done));
+}
+
+/**
  * Removes every context menu item that this extension owns.
  * @returns A promise that resolves when Chrome removes the items and rejects on lastError
  */
 function removeAllMenuItems(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    chrome.contextMenus.removeAll(() => {
-      const lastError = chrome.runtime.lastError;
-      if (lastError) {
-        reject(new Error(lastError.message));
-        return;
-      }
-      resolve();
-    });
-  });
+  return viaCallback((done) => chrome.contextMenus.removeAll(done));
 }
 
 /**

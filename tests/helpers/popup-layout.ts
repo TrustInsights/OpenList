@@ -3,7 +3,7 @@
 import { type Page, expect } from '@playwright/test';
 
 /** A state of the popup that the layout checks visit. */
-export type PopupState = 'default' | 'details open' | 'error' | 'status message';
+type PopupState = 'default' | 'details open' | 'error' | 'status message';
 
 /** Every state that the layout checks visit. */
 export const STATES: PopupState[] = ['default', 'details open', 'error', 'status message'];

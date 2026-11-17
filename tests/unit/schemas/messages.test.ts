@@ -70,7 +70,6 @@ describe('OpenListResponseSchema', () => {
         successful: 3,
         failed: 1,
 
-        totalTime: 500,
         errors: ['some error'],
         opened: ['https://a.com'],
       },
@@ -80,7 +79,7 @@ describe('OpenListResponseSchema', () => {
 
   it('rejects missing status', () => {
     const result = OpenListResponseSchema.safeParse({
-      results: { successful: 0, failed: 0, totalTime: 0, errors: [], opened: [] },
+      results: { successful: 0, failed: 0, errors: [], opened: [] },
     });
     expect(result.success).toBe(false);
   });
@@ -88,7 +87,7 @@ describe('OpenListResponseSchema', () => {
   it('rejects wrong status value', () => {
     const result = OpenListResponseSchema.safeParse({
       status: 'pending',
-      results: { successful: 0, failed: 0, totalTime: 0, errors: [], opened: [] },
+      results: { successful: 0, failed: 0, errors: [], opened: [] },
     });
     expect(result.success).toBe(false);
   });
@@ -96,7 +95,7 @@ describe('OpenListResponseSchema', () => {
   it('rejects negative successful count', () => {
     const result = OpenListResponseSchema.safeParse({
       status: 'complete',
-      results: { successful: -1, failed: 0, totalTime: 0, errors: [], opened: [] },
+      results: { successful: -1, failed: 0, errors: [], opened: [] },
     });
     expect(result.success).toBe(false);
   });
@@ -104,15 +103,7 @@ describe('OpenListResponseSchema', () => {
   it('rejects negative failed count', () => {
     const result = OpenListResponseSchema.safeParse({
       status: 'complete',
-      results: { successful: 0, failed: -1, totalTime: 0, errors: [], opened: [] },
-    });
-    expect(result.success).toBe(false);
-  });
-
-  it('rejects negative totalTime', () => {
-    const result = OpenListResponseSchema.safeParse({
-      status: 'complete',
-      results: { successful: 0, failed: 0, totalTime: -1, errors: [] },
+      results: { successful: 0, failed: -1, errors: [], opened: [] },
     });
     expect(result.success).toBe(false);
   });
@@ -120,7 +111,7 @@ describe('OpenListResponseSchema', () => {
   it('rejects non-integer successful count', () => {
     const result = OpenListResponseSchema.safeParse({
       status: 'complete',
-      results: { successful: 1.5, failed: 0, totalTime: 0, errors: [], opened: [] },
+      results: { successful: 1.5, failed: 0, errors: [], opened: [] },
     });
     expect(result.success).toBe(false);
   });
@@ -128,7 +119,7 @@ describe('OpenListResponseSchema', () => {
   it('rejects a response without opened', () => {
     const result = OpenListResponseSchema.safeParse({
       status: 'complete',
-      results: { successful: 0, failed: 0, totalTime: 0, errors: [] },
+      results: { successful: 0, failed: 0, errors: [] },
     });
     expect(result.success).toBe(false);
   });
@@ -136,7 +127,7 @@ describe('OpenListResponseSchema', () => {
   it('rejects a non-string entry in opened', () => {
     const result = OpenListResponseSchema.safeParse({
       status: 'complete',
-      results: { successful: 0, failed: 0, totalTime: 0, errors: [], opened: [1] },
+      results: { successful: 0, failed: 0, errors: [], opened: [1] },
     });
     expect(result.success).toBe(false);
   });
@@ -148,7 +139,6 @@ describe('OpenListResponseSchema', () => {
         successful: 0,
         failed: 0,
 
-        totalTime: 0,
         errors: 'not array',
         opened: [],
       },

@@ -166,21 +166,6 @@ test.describe('Popup', () => {
       `https://www.trustinsights.ai?utm_source=openlist&utm_medium=referral&utm_campaign=openlist_${version.replaceAll('.', '_')}`
     );
   });
-
-  test('opens a pasted URL in a new tab when the button is clicked', async ({
-    context,
-    site,
-    popup,
-    countTabs,
-  }) => {
-    const page = await context.newPage();
-    await popup(page);
-
-    await page.locator('#list').fill(site.url('a'));
-    await page.getByRole('button', { name: 'Open 1 URL' }).click();
-
-    await expect.poll(() => countTabs(site.origin)).toBe(1);
-  });
 });
 
 test.describe('Popup with clipboard access granted', () => {

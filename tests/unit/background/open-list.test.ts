@@ -98,12 +98,4 @@ describe('openList', () => {
     expect(result.opened).toEqual(['https://a.com']);
     expect(errorLog).toHaveBeenCalledWith('Totals update failed', { error: 'quota' });
   });
-
-  it('totalTime is set and non-negative', async () => {
-    const promise = openList(['https://example.com']);
-    await vi.runAllTimersAsync();
-    const result = await promise;
-
-    expect(result.totalTime).toBeGreaterThanOrEqual(0);
-  });
 });

@@ -36,7 +36,7 @@ OpenList is a Chrome extension designed to enhance user productivity by simplify
 *   **URL Opening from Popup:**
     *   Provide a browser action (popup) with a text area for users to paste lists of URLs. ✅
     *   Include an "Open N URLs" button in the popup, filled, beside the "Copy N as FORMAT" button, over one editable list. ✅ Tests: `App.test.tsx`, `App-actions.test.tsx`, `ActionButtons.test.tsx`, `popup.spec.ts` ("renders the list, the two actions, and the copy formats in three groups").
-    *   Allow users to trigger URL opening by pressing Ctrl+Enter or Cmd+Enter in the text area. ✅ Tests: `keyboard.spec.ts` ("Control+Enter opens the URLs of the list", "Meta+Enter opens the URLs of the list").
+    *   Allow users to trigger URL opening by pressing Ctrl+Enter or Cmd+Enter in the text area. ✅ Tests: `open.spec.ts` (Control+Enter on pasted URLs) and `keyboard.spec.ts` ("Meta+Enter opens the URLs of the list").
     *   Upon activation, the extension must:
         *   Process the list of URLs from the text area, line by line. ✅
         *   Sanitize and validate each URL. ✅
@@ -79,7 +79,7 @@ OpenList is a Chrome extension designed to enhance user productivity by simplify
     *   Ensure accessibility of the popup UI to WCAG 2.1 AA, including keyboard navigation, visible focus, labels, status and alert roles, 4.5:1 text contrast, 3:1 control borders, 44 px controls, reflow at 320 px, and forced colors. Automated checks are done ✅. Tests: `tokens-contrast.test.ts`, the `vitest-axe` scans in `tests/unit/components/`, `a11y.spec.ts` (axe in light and dark, tab order, focus ring), `keyboard-only.spec.ts`, `reflow.spec.ts` (200% and 400% zoom, text spacing), and `forced-colors.spec.ts`. The manual items (VoiceOver, real Windows forced colors, real zoom) are NOT DONE. OpenList is not called compliant until they are done. Record: docs/accessibility.md.
     *   Use CSS variables for styling to manage themes and ensure consistency. ✅
 *   **Configuration:**
-    *   Define constants in `src/schemas/config.ts` (`MAX_TABS`, `DELAY_BETWEEN_TABS`, `CONTEXT_MENU_ID`, `COPY_WINDOW_MENU_ID`) and local constants where one module uses them (`MAX_VISIBLE_ERRORS`, `TAB_RETRIES`, `RETRY_DELAY_MS`). The popup no longer polls, so `POLL_INTERVAL_MS` is gone. ✅
+    *   Define constants in `src/schemas/config.ts` (`MAX_TABS`, `DELAY_BETWEEN_TABS`, `CONTEXT_MENU_ID`, `COPY_WINDOW_MENU_ID`) and local constants where one module uses them (`TAB_RETRIES`, `RETRY_DELAY_MS`). The popup no longer polls, so `POLL_INTERVAL_MS` is gone. ✅
 
 **5. Domain Requirements:**
 

@@ -1,21 +1,20 @@
-// E2E tests for keyboard use: Ctrl and Cmd+Enter, the focus on open, and the format control
+// E2E tests for keyboard use: Cmd+Enter, the focus on open, and the format control
 
 import { expect, test } from '@tests/e2e/fixtures';
 
 test.describe('Keyboard shortcuts', () => {
-  for (const key of ['Control+Enter', 'Meta+Enter']) {
-    test(`${key} opens the URLs of the list`, async ({ context, site, popup, countTabs }) => {
-      const page = await context.newPage();
-      await popup(page);
+  // Control+Enter is covered in open.spec.ts.
+  test('Meta+Enter opens the URLs of the list', async ({ context, site, popup, countTabs }) => {
+    const page = await context.newPage();
+    await popup(page);
 
-      const textarea = page.locator('#list');
-      await textarea.fill(site.url('a'));
-      await textarea.press(key);
+    const textarea = page.locator('#list');
+    await textarea.fill(site.url('a'));
+    await textarea.press('Meta+Enter');
 
-      await expect(page.getByRole('status')).toHaveText('Opened 1.');
-      await expect.poll(() => countTabs(site.origin)).toBe(1);
-    });
-  }
+    await expect(page.getByRole('status')).toHaveText('Opened 1.');
+    await expect.poll(() => countTabs(site.origin)).toBe(1);
+  });
 
   test('a plain Enter adds a line and opens nothing', async ({
     context,

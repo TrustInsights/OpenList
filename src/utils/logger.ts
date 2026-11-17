@@ -2,30 +2,13 @@
 
 type LogLevel = 'info' | 'warn' | 'error';
 
-interface LogEntry {
-  timestamp: string;
-  level: LogLevel;
-  message: string;
-  data?: Record<string, unknown>;
-}
-
-function buildEntry(level: LogLevel, message: string, data?: Record<string, unknown>): LogEntry {
-  const entry: LogEntry = { timestamp: new Date().toISOString(), level, message };
-  if (data !== undefined) entry.data = data;
-  return entry;
-}
-
 const isDev = import.meta.env.DEV;
 
-type ConsoleFn = typeof console.info;
-const CONSOLE_FN: Record<LogLevel, ConsoleFn> = {
-  info: console.info,
-  warn: console.warn,
-  error: console.error,
-};
-
+/** Writes one JSON line (timestamp, level, message, and data when given) to the console in a dev build only. */
 function emit(level: LogLevel, message: string, data?: Record<string, unknown>): void {
-  if (isDev) CONSOLE_FN[level](JSON.stringify(buildEntry(level, message, data)));
+  if (isDev) {
+    console[level](JSON.stringify({ timestamp: new Date().toISOString(), level, message, data }));
+  }
 }
 
 /**

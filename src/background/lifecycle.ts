@@ -1,4 +1,4 @@
-// Service worker lifecycle handlers that never reject
+// Service worker lifecycle handler that never rejects
 
 import { initializeContextMenu } from '@/background/context-menu';
 import { toErrorMessage } from '@/utils/errors';
@@ -19,25 +19,13 @@ async function runStep(step: () => Promise<void>): Promise<void> {
 }
 
 /**
- * Handles chrome.runtime.onInstalled. Saves the session start, then creates the context menu. A failed step is logged, not thrown.
+ * Handles chrome.runtime.onInstalled and chrome.runtime.onStartup. Saves the session start, then creates the context menu. A failed step is logged, not thrown.
  * @returns A promise that always resolves
  */
-export async function handleInstalled(): Promise<void> {
+export async function handleLifecycle(): Promise<void> {
   await runStep(async () => {
     await markSessionStart();
-    logger.info('Extension installed/updated');
-  });
-  await runStep(initializeContextMenu);
-}
-
-/**
- * Handles chrome.runtime.onStartup. Saves the session start, then creates the context menu. A failed step is logged, not thrown.
- * @returns A promise that always resolves
- */
-export async function handleStartup(): Promise<void> {
-  await runStep(async () => {
-    await markSessionStart();
-    logger.info('Service worker started');
+    logger.info('Session started');
   });
   await runStep(initializeContextMenu);
 }

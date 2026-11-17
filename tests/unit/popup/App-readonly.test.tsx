@@ -14,7 +14,7 @@ let user: ReturnType<typeof userEvent.setup>;
 function reply(opened: string[]): unknown {
   return {
     status: 'complete',
-    results: { successful: opened.length, failed: 0, totalTime: 5, errors: [], opened },
+    results: { successful: opened.length, failed: 0, errors: [], opened },
   };
 }
 

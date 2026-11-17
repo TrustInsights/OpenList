@@ -24,6 +24,13 @@ describe('service worker entry point', () => {
     expect(chrome.commands.onCommand.addListener).toHaveBeenCalledOnce();
   });
 
+  it('runs one handler for both the install and the start event', async () => {
+    await import('@/background/index');
+    expect(listenerOf(chrome.runtime.onInstalled.addListener)).toBe(
+      listenerOf(chrome.runtime.onStartup.addListener)
+    );
+  });
+
   it('clears the toolbar hint when the user grants a permission', async () => {
     const feedback = await import('@/background/feedback');
     const clear = vi.spyOn(feedback, 'clearFeedback').mockResolvedValue(undefined);

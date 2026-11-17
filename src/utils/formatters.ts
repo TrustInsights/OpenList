@@ -13,7 +13,7 @@ export interface ClipboardPayload {
 type Group = readonly TabRecord[];
 
 /** The header row of the CSV format. The extractor reads the same text. */
-const CSV_HEADER = 'title,url,window,index,pinned,active';
+export const CSV_HEADER = 'title,url,window,index,pinned,active';
 
 /** The first characters that make a spreadsheet run a cell as a formula. */
 const FORMULA_START = /^[=+\-@\t\r]/;

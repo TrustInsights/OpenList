@@ -3,12 +3,12 @@
 import { useListActions } from '@/hooks/useListActions';
 import type { Format } from '@/schemas/settings';
 import type { TabRecord } from '@/schemas/tab';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import { expect, vi } from 'vitest';
 
 /** What the harness returns: the actions plus the text and its setter. */
-export type Harness = ReturnType<typeof useListActions> & {
+type Harness = ReturnType<typeof useListActions> & {
   text: string;
   setText: (text: string) => void;
 };
@@ -47,6 +47,10 @@ export async function renderActions(
     return { ...actions, text, setText };
   });
   await waitFor(() => expect(chrome.tabs.query).toHaveBeenCalled());
+  // The open-tab keys land in state after the lookup settles, so wait for that before a test acts.
+  await act(async () => {
+    await Promise.allSettled(vi.mocked(chrome.tabs.query).mock.results.map((r) => r.value));
+  });
   await waitFor(() => expect(view.result.current.running).toBe(false));
   return view.result;
 }

@@ -4,7 +4,7 @@
   padding: 8px 12px;
   color: var(--err);
   background: var(--err-bg);
-  border: 1px solid var(--err-border);
+  border: 1px solid var(--err);
   border-radius: 8px;
 }
 
@@ -13,12 +13,6 @@
   font-weight: 500;
   white-space: pre-line;
   overflow-wrap: anywhere;
-}
-
-.error-details {
-  margin: 4px 0 0;
-  padding-left: 20px;
-  font-size: 12px;
 }
 
 .clipboard-prompt {

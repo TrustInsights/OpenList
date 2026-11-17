@@ -12,6 +12,19 @@ Nothing yet.
 
 - `lastError` and `recordError`: write-only (nothing read them), and a Chrome error text can hold a page address, against the promise that the totals never hold a URL (ruling 39). The totals keep three counters. Failed opens still count and show in the popup.
 
+### Security (dev tooling)
+
+- The audit gate ignores GHSA-fc5q-39xc-vjpf (picomatch ReDoS) because no patched version exists, the path is dev tooling only, and the zip holds no picomatch. See ruling 44. Remove the exception when a patched picomatch ships.
+
+### Changed (Chisle repo-wide review, 2026-11-17)
+
+- Removed `src/types/index.ts`: `Totals` now lives in `src/schemas/metrics.ts` and `OpenListResult` in `src/schemas/messages.ts`. Removed `src/schemas/urls.ts`: the blocked protocol list is private in `src/utils/urls.ts`.
+- Removed write-only and dead code: `totalTime` (reply and schema), the error reply field `details`, the `details` prop and overflow list of `ErrorDisplay`, `State.error` of `ErrorBoundary`, the token `--err-border` (now `--err`), the `mac` entry of the shortcut (it repeated `default`), `about:blank` in the junk list, the `preview` script, `outDir` and `rootDir`, and the excludes that never matched.
+- Merged duplicates: one `handleLifecycle` for install and start, one `normalizeText` for the BOM and CRLF rule, one `upgradeHttp` for the http rule of ruling 30 (`isLocalHost` is private), one `CSV_HEADER`, one callback wrapper for the menu calls, and one `emit` in the logger. `isProbablyUrl` takes a string. `DetailsPanel` needs `onToggle`.
+- `planOpen` takes the parsed entries, so the popup and the right-click path parse the list once.
+- Playwright keeps a trace on failure (`retain-on-failure`) because retries are 0.
+- Tests: deleted the cases that repeated others (`structured-values.test.ts`, `schemas/urls.test.ts`, the Control+Enter run in `keyboard.spec.ts`, the click test in `popup.spec.ts`, the details tests of `ErrorDisplay`, the weak-pair test of the contrast helper, the positive axe case). Tables replace the repeated cases in the messages, config, logger, and errors tests. Ruling 43.
+
 ### Fixed (Chisle review of 2026-11-17)
 
 - Two overlapping copy runs (shortcut and toolbar menu) no longer fail with "Receiving end does not exist": the runs write one at a time through the shared offscreen document.

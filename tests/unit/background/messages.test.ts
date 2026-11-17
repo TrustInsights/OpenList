@@ -7,56 +7,23 @@ import { describe, expect, it, vi } from 'vitest';
 const fakeSender = {} as chrome.runtime.MessageSender;
 
 describe('handleMessage', () => {
-  it('unknown action → sendResponse({ status: "error" }), returns false', () => {
+  it.each([
+    ['an unknown action', { action: 'unknownAction' }],
+    ['a payload with no action', { notAnAction: true }],
+    ['urls that are not an array', { action: 'openList', urls: 42 }],
+    ['urls as a string', { action: 'openList', urls: 'https://example.com' }],
+    ['an empty urls array', { action: 'openList', urls: [] }],
+    ['a null payload', null],
+    ['the removed getMetrics action', { action: 'getMetrics' }],
+    ['the removed getCurrentTabUrls action', { action: 'getCurrentTabUrls' }],
+  ])('rejects %s with the exact error reply and no zod text', (_name, payload) => {
     const sendResponse = vi.fn();
-    const result = handleMessage({ action: 'unknownAction' }, fakeSender, sendResponse);
+    const result = handleMessage(payload, fakeSender, sendResponse);
 
     expect(result).toBe(false);
-    expect(sendResponse).toHaveBeenCalledWith(expect.objectContaining({ status: 'error' }));
-  });
-
-  it('invalid payload (not Zod-valid) → sendResponse({ status: "error" }), returns false', () => {
-    const sendResponse = vi.fn();
-    const result = handleMessage({ notAnAction: true }, fakeSender, sendResponse);
-
-    expect(result).toBe(false);
-    expect(sendResponse).toHaveBeenCalledWith(expect.objectContaining({ status: 'error' }));
-  });
-
-  it('invalid message → exact { status: "error", message: "Unknown action" } with no zod text', () => {
-    const sendResponse = vi.fn();
-    handleMessage({ action: 'openList', urls: 42 }, fakeSender, sendResponse);
-
     expect(sendResponse).toHaveBeenCalledTimes(1);
     expect(sendResponse).toHaveBeenCalledWith({ status: 'error', message: 'Unknown action' });
-  });
-
-  it('openList message with urls as a string → rejected', () => {
-    const sendResponse = vi.fn();
-    const result = handleMessage(
-      { action: 'openList', urls: 'https://example.com' },
-      fakeSender,
-      sendResponse
-    );
-
-    expect(result).toBe(false);
-    expect(sendResponse).toHaveBeenCalledWith({ status: 'error', message: 'Unknown action' });
-  });
-
-  it('openList message with an empty array → rejected', () => {
-    const sendResponse = vi.fn();
-    const result = handleMessage({ action: 'openList', urls: [] }, fakeSender, sendResponse);
-
-    expect(result).toBe(false);
-    expect(sendResponse).toHaveBeenCalledWith({ status: 'error', message: 'Unknown action' });
-  });
-
-  it('null payload → sendResponse({ status: "error" }), returns false', () => {
-    const sendResponse = vi.fn();
-    const result = handleMessage(null, fakeSender, sendResponse);
-
-    expect(result).toBe(false);
-    expect(sendResponse).toHaveBeenCalledWith(expect.objectContaining({ status: 'error' }));
+    expect(chrome.tabs.query).not.toHaveBeenCalled();
   });
 
   describe('"openList" action', () => {
@@ -64,7 +31,6 @@ describe('handleMessage', () => {
       const fakeResults = {
         successful: 2,
         failed: 0,
-        totalTime: 50,
         errors: [],
         opened: ['https://example.com', 'https://test.com'],
       };
@@ -110,29 +76,6 @@ describe('handleMessage', () => {
         expect.objectContaining({ status: 'error', message: 'processing failed' })
       );
       openListSpy.mockRestore();
-    });
-  });
-
-  describe('"getMetrics" action (removed)', () => {
-    it('rejects { action: "getMetrics" } as unknown and returns false', () => {
-      const sendResponse = vi.fn();
-      const result = handleMessage({ action: 'getMetrics' }, fakeSender, sendResponse);
-
-      expect(result).toBe(false);
-      expect(sendResponse).toHaveBeenCalledTimes(1);
-      expect(sendResponse).toHaveBeenCalledWith({ status: 'error', message: 'Unknown action' });
-    });
-  });
-
-  describe('"getCurrentTabUrls" action (removed)', () => {
-    it('rejects { action: "getCurrentTabUrls" } as unknown and returns false', () => {
-      const sendResponse = vi.fn();
-      const result = handleMessage({ action: 'getCurrentTabUrls' }, fakeSender, sendResponse);
-
-      expect(result).toBe(false);
-      expect(sendResponse).toHaveBeenCalledTimes(1);
-      expect(sendResponse).toHaveBeenCalledWith({ status: 'error', message: 'Unknown action' });
-      expect(chrome.tabs.query).not.toHaveBeenCalled();
     });
   });
 });

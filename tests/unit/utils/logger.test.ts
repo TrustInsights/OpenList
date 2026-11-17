@@ -2,9 +2,8 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// The logger module captures console.info/warn/error references at load time
-// via the CONSOLE_FN map. We must spy on console methods BEFORE importing the
-// module (using vi.resetModules + dynamic import) so the spy intercepts them.
+// The logger reads import.meta.env.DEV when it loads. Each test resets the modules, stubs DEV,
+// and imports the logger again.
 
 describe('logger (DEV=true)', () => {
   beforeEach(() => {
@@ -17,26 +16,15 @@ describe('logger (DEV=true)', () => {
     vi.restoreAllMocks();
   });
 
-  it('logger.info calls console.info when DEV is true', async () => {
-    const spy = vi.spyOn(console, 'info').mockImplementation(() => {});
-    const { logger } = await import('@/utils/logger');
-    logger.info('hello');
-    expect(spy).toHaveBeenCalledTimes(1);
-  });
-
-  it('logger.warn calls console.warn when DEV is true', async () => {
-    const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const { logger } = await import('@/utils/logger');
-    logger.warn('a warning');
-    expect(spy).toHaveBeenCalledTimes(1);
-  });
-
-  it('logger.error calls console.error when DEV is true', async () => {
-    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const { logger } = await import('@/utils/logger');
-    logger.error('an error');
-    expect(spy).toHaveBeenCalledTimes(1);
-  });
+  it.each(['info', 'warn', 'error'] as const)(
+    'logger.%s calls the console method of the same name when DEV is true',
+    async (level) => {
+      const spy = vi.spyOn(console, level).mockImplementation(() => {});
+      const { logger } = await import('@/utils/logger');
+      logger[level]('a message');
+      expect(spy).toHaveBeenCalledTimes(1);
+    }
+  );
 
   it('log entry includes timestamp, level, and message', async () => {
     const spy = vi.spyOn(console, 'info').mockImplementation(() => {});
@@ -82,24 +70,13 @@ describe('logger (DEV=false)', () => {
     vi.restoreAllMocks();
   });
 
-  it('logger.info does NOT call console.info when DEV is false', async () => {
-    const spy = vi.spyOn(console, 'info').mockImplementation(() => {});
-    const { logger } = await import('@/utils/logger');
-    logger.info('should be silent');
-    expect(spy).not.toHaveBeenCalled();
-  });
-
-  it('logger.warn does NOT call console.warn when DEV is false', async () => {
-    const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const { logger } = await import('@/utils/logger');
-    logger.warn('should be silent');
-    expect(spy).not.toHaveBeenCalled();
-  });
-
-  it('logger.error does NOT call console.error when DEV is false', async () => {
-    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const { logger } = await import('@/utils/logger');
-    logger.error('should be silent');
-    expect(spy).not.toHaveBeenCalled();
-  });
+  it.each(['info', 'warn', 'error'] as const)(
+    'logger.%s does not call the console when DEV is false',
+    async (level) => {
+      const spy = vi.spyOn(console, level).mockImplementation(() => {});
+      const { logger } = await import('@/utils/logger');
+      logger[level]('should be silent');
+      expect(spy).not.toHaveBeenCalled();
+    }
+  );
 });

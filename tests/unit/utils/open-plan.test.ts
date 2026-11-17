@@ -1,17 +1,22 @@
 // Unit tests for utils/open-plan.ts: the open plan, the button label, and the remaining text
 
-import { urlKey } from '@/utils/extract-urls';
+import { parseList, urlKey } from '@/utils/extract-urls';
 import {
   type OpenPlan,
   allOpen,
   entryUrl,
   openLabel,
-  planOpen,
+  planOpen as planEntries,
   remainingText,
 } from '@/utils/open-plan';
 import { describe, expect, it } from 'vitest';
 
 const CAP = 20;
+
+/** Plans an Open click from the list text, as the popup does: parse once, then plan. */
+function planOpen(text: string, openKeys: ReadonlySet<string>, cap: number): OpenPlan {
+  return planEntries(parseList(text).entries, openKeys, cap);
+}
 
 /** Builds a list text of `count` distinct URLs, one per line. */
 function manyUrls(count: number): string {

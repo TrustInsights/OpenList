@@ -8,8 +8,7 @@
   "commands": {
     "copy-window": {
       "suggested_key": {
-        "default": "Alt+Shift+C",
-        "mac": "Alt+Shift+C"
+        "default": "Alt+Shift+C"
       },
       "description": "Copy this window's tabs"
     }

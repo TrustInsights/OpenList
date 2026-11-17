@@ -1,7 +1,7 @@
 // Opens a list of final URLs in new tabs
 
 import { CONFIG } from '@/schemas/config';
-import type { OpenListResult } from '@/types';
+import type { OpenListResult } from '@/schemas/messages';
 import { toErrorMessage } from '@/utils/errors';
 import { logger } from '@/utils/logger';
 import { addTotals } from '@/utils/metrics-store';
@@ -13,11 +13,9 @@ import { createTab, sleep } from '@/utils/tabs';
  * @returns Results summary with counts, error details, and the URLs that opened
  */
 export async function openList(urls: readonly string[]): Promise<OpenListResult> {
-  const startTime = performance.now();
   const results: OpenListResult = {
     successful: 0,
     failed: 0,
-    totalTime: 0,
     errors: [],
     opened: [],
   };
@@ -58,8 +56,6 @@ export async function openList(urls: readonly string[]): Promise<OpenListResult>
     // The counters never change the result: the tabs are open already.
     logger.error('Totals update failed', { error: toErrorMessage(err) });
   }
-
-  results.totalTime = performance.now() - startTime;
 
   logger.info('URL processing complete', { results });
   return results;
