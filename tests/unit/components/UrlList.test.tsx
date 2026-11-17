@@ -11,7 +11,13 @@ function Harness({
   initial,
   onOpen,
   invalid = false,
-}: { initial: string; onOpen: () => void; invalid?: boolean }): React.JSX.Element {
+  readOnly = false,
+}: {
+  initial: string;
+  onOpen: () => void;
+  invalid?: boolean;
+  readOnly?: boolean;
+}): React.JSX.Element {
   const [value, setValue] = useState(initial);
   return (
     <>
@@ -21,6 +27,7 @@ function Harness({
         invalid={invalid}
         describedBy={invalid ? 'list-error' : undefined}
         onOpen={onOpen}
+        readOnly={readOnly}
       />
       <button type="button" onClick={() => setValue('https://late.com/\nhttps://later.com/')}>
         load
@@ -100,6 +107,22 @@ describe('UrlList', () => {
     await user.keyboard('{Enter}');
     await user.keyboard('{Control>}a{/Control}');
     expect(onOpen).not.toHaveBeenCalled();
+  });
+
+  it('is read-only and keeps the focus when readOnly is set, so typing changes nothing', async () => {
+    const user = userEvent.setup();
+    render(<Harness initial="https://a.com/" readOnly onOpen={() => undefined} />);
+    const box = screen.getByRole('textbox');
+    expect(box).toHaveAttribute('readonly');
+    expect(box).toBeEnabled();
+    expect(box).toHaveFocus();
+    await user.type(box, 'abc');
+    expect(box).toHaveValue('https://a.com/');
+  });
+
+  it('is editable by default', () => {
+    render(<Harness initial="" onOpen={() => undefined} />);
+    expect(screen.getByRole('textbox')).not.toHaveAttribute('readonly');
   });
 
   it('reports each edit through onChange', async () => {

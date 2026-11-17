@@ -99,9 +99,8 @@ describe('parseList: line by line', () => {
   });
 
   it('skips a site-like line that does not parse', () => {
-    expect(parseList('ftp://').entries).toEqual([]);
+    expect(parseList('https://').entries).toEqual([]);
   });
-
   it('keeps repeated search terms', () => {
     expect(parseList('pizza\npizza').entries).toHaveLength(2);
   });

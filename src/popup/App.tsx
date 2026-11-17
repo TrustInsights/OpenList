@@ -67,6 +67,7 @@ function PopupContent(): React.JSX.Element {
           invalid={emptyListError}
           describedBy={emptyListError ? 'list-error' : undefined}
           onOpen={open}
+          readOnly={actions.running}
         />
         <SourceSelect
           options={sources.options}

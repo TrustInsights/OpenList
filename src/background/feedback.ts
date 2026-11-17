@@ -14,8 +14,11 @@ const BADGE_TEXT_COLOR = '#ffffff';
 /** The pending reset, so a second result never loses its feedback to the first timer. */
 let resetTimer: ReturnType<typeof setTimeout> | undefined;
 
-/** The sticky message that waits for the user to act. A short result shows over it, then it comes back. */
-let stickyMessage: string | undefined;
+/**
+ * Key of the sticky message in session storage. The message waits for the user to act and a short result
+ * shows over it. It lives in storage because Chrome ends an idle service worker, but the title and the badge stay.
+ */
+const STICKY_KEY = 'stickyMessage';
 
 /**
  * Paints the badge and the title.
@@ -54,7 +57,11 @@ async function rest(): Promise<void> {
  */
 export async function clearFeedback(): Promise<void> {
   clearTimeout(resetTimer);
-  stickyMessage = undefined;
+  try {
+    await chrome.storage.session.remove(STICKY_KEY);
+  } catch (err) {
+    logger.error('Feedback reset failed', { error: toErrorMessage(err) });
+  }
   await rest();
 }
 
@@ -63,12 +70,13 @@ export async function clearFeedback(): Promise<void> {
  * @returns A promise that resolves when the badge and the title are set
  */
 async function endShortResult(): Promise<void> {
-  if (stickyMessage === undefined) {
-    await rest();
-    return;
-  }
   try {
-    await paint(stickyMessage, false);
+    const sticky = (await chrome.storage.session.get(STICKY_KEY))[STICKY_KEY];
+    if (typeof sticky !== 'string') {
+      await rest();
+      return;
+    }
+    await paint(sticky, false);
   } catch (err) {
     logger.error('Feedback restore failed', { error: toErrorMessage(err) });
   }
@@ -86,9 +94,11 @@ async function endShortResult(): Promise<void> {
  */
 export async function showResult(message: string, ok: boolean, sticky = false): Promise<void> {
   clearTimeout(resetTimer);
-  if (sticky) stickyMessage = message;
   await paint(message, ok);
-  if (sticky) return;
+  if (sticky) {
+    await chrome.storage.session.set({ [STICKY_KEY]: message });
+    return;
+  }
   resetTimer = setTimeout(() => {
     void endShortResult();
   }, FEEDBACK_MS);

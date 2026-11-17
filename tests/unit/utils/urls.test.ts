@@ -22,6 +22,10 @@ describe('isProbablyUrl', () => {
     });
   });
 
+  it('returns false for ftp://, because Chrome 95 and later cannot load it', () => {
+    expect(isProbablyUrl('ftp://files.example.com')).toBe(false);
+  });
+
   describe('returns false for blocked protocols', () => {
     it('returns false for javascript:', () => {
       expect(isProbablyUrl('javascript:alert(1)')).toBe(false);
@@ -55,10 +59,6 @@ describe('isProbablyUrl', () => {
 
     it('returns true for http:// URLs', () => {
       expect(isProbablyUrl('http://example.com')).toBe(true);
-    });
-
-    it('returns true for ftp:// URLs', () => {
-      expect(isProbablyUrl('ftp://files.example.com')).toBe(true);
     });
 
     it('returns true for chrome:// URLs', () => {

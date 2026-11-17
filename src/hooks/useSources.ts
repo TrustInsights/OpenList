@@ -189,11 +189,15 @@ export function useSources(): SourcesState {
     noticeSeq,
     clipboardPrompt: permission === 'denied' ? (dismissed ? 'details' : 'button') : 'hidden',
     enableClipboard: async (): Promise<void> => {
-      if (!(await requestClipboardPermission())) return;
-      const urls = (await readClipboardUrls()) ?? [];
-      setClipboard(urls);
-      setPermission('granted');
-      if (!touched.current) applyPick(pickDefault(loaded, urls));
+      try {
+        if (!(await requestClipboardPermission())) return;
+        const urls = (await readClipboardUrls()) ?? [];
+        setClipboard(urls);
+        setPermission('granted');
+        if (!touched.current) applyPick(pickDefault(loaded, urls));
+      } catch {
+        setNotice('Could not turn on clipboard detection.');
+      }
     },
     dismissPrompt: (): void => {
       setDismissed(true);

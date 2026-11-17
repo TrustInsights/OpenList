@@ -9,13 +9,15 @@ interface UrlListProps {
   invalid: boolean;
   describedBy?: string;
   onOpen: () => void;
+  /** True while an action runs: the text cannot change, and the box keeps its focus. */
+  readOnly?: boolean;
 }
 
 /**
  * Renders the label and the text box of the list.
  * The box takes focus on mount. The first text that arrives is selected, so a paste replaces it.
  * Text the user typed is never selected. Ctrl+Enter or Cmd+Enter runs Open.
- * @param props - The text, its change handler, the invalid state, the id of the error, and the Open action.
+ * @param props - The text, its change handler, the invalid state, the id of the error, the Open action, and the read-only state.
  * @returns The label and the text box, as siblings for the popup grid.
  */
 export function UrlList({
@@ -24,6 +26,7 @@ export function UrlList({
   invalid,
   describedBy,
   onOpen,
+  readOnly = false,
 }: UrlListProps): React.JSX.Element {
   const box = useRef<HTMLTextAreaElement>(null);
   const selected = useRef(false);
@@ -62,6 +65,7 @@ export function UrlList({
         aria-invalid={invalid ? true : undefined}
         aria-describedby={describedBy}
         placeholder="Paste URLs here. Other text becomes a web search."
+        readOnly={readOnly}
         spellCheck={false}
       />
     </>

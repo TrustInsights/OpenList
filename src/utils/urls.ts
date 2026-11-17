@@ -3,8 +3,8 @@
 import { BLOCKED_PROTOCOLS } from '@/schemas/urls';
 import { logger } from '@/utils/logger';
 
-/** Protocols accepted as valid URL prefixes (non-exhaustive; bare domains are also accepted). */
-const ALLOWED_PROTOCOLS = ['https:', 'http:', 'ftp:', 'chrome:', 'chrome-extension:'] as const;
+/** Protocols accepted as valid URL prefixes (non-exhaustive; bare domains are also accepted). Chrome 95 removed ftp:. */
+const ALLOWED_PROTOCOLS = ['https:', 'http:', 'chrome:', 'chrome-extension:'] as const;
 
 /** Site-like text: optional www., dotted host with a TLD, optional port, then path, query, or fragment. */
 const SITE_PATTERN =

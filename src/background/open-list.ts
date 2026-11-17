@@ -48,11 +48,16 @@ export async function openList(urls: readonly string[]): Promise<OpenListResult>
     }
   }
 
-  await addTotals({
-    tabsOpened: results.successful,
-    tabsFailed: results.failed,
-    urlsProcessed: results.successful + results.failed,
-  });
+  try {
+    await addTotals({
+      tabsOpened: results.successful,
+      tabsFailed: results.failed,
+      urlsProcessed: results.successful + results.failed,
+    });
+  } catch (err) {
+    // The counters never change the result: the tabs are open already.
+    logger.error('Totals update failed', { error: toErrorMessage(err) });
+  }
 
   results.totalTime = performance.now() - startTime;
 

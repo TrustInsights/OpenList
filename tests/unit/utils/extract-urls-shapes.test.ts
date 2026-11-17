@@ -156,3 +156,12 @@ describe('webAddresses', () => {
     ).toHaveLength(1);
   });
 });
+
+describe('ftp line', () => {
+  it('is not an address, because Chrome 95 and later cannot load it', () => {
+    expect(parseList('ftp://old.example/f').entries).toEqual([
+      { kind: 'search', term: 'ftp://old.example/f', line: 0 },
+    ]);
+    expect(read('ftp://old.example/f')).toEqual(['ftp://old.example/f']);
+  });
+});

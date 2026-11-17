@@ -1,6 +1,7 @@
 // Unit tests for background/open-list.ts
 
 import { openList } from '@/background/open-list';
+import { logger } from '@/utils/logger';
 import * as metricsModule from '@/utils/metrics-store';
 import * as tabsModule from '@/utils/tabs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -83,6 +84,19 @@ describe('openList', () => {
       tabsFailed: 0,
       urlsProcessed: 2,
     });
+  });
+
+  it('still returns the result when the counters cannot be saved', async () => {
+    const errorLog = vi.spyOn(logger, 'error');
+    vi.mocked(metricsModule.addTotals).mockRejectedValue(new Error('quota'));
+
+    const promise = openList(['https://a.com']);
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(result.successful).toBe(1);
+    expect(result.opened).toEqual(['https://a.com']);
+    expect(errorLog).toHaveBeenCalledWith('Totals update failed', { error: 'quota' });
   });
 
   it('totalTime is set and non-negative', async () => {

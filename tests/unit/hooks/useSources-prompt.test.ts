@@ -106,6 +106,14 @@ describe('useSources clipboard prompt', () => {
     expect(clipboard.readText).not.toHaveBeenCalled();
   });
 
+  it('enableClipboard shows a notice and keeps the button when the request rejects', async () => {
+    const { result } = await loaded();
+    request.mockRejectedValue(new Error('request failed'));
+    await act(async () => result.current.enableClipboard());
+    expect(result.current.notice).toBe('Could not turn on clipboard detection.');
+    expect(result.current.clipboardPrompt).toBe('button');
+  });
+
   it('enableClipboard hides the prompt when the new read finds nothing', async () => {
     const { result } = await loaded();
     request.mockResolvedValue(true);

@@ -20,7 +20,11 @@ export interface FakeStorage {
 function makeArea(
   store: Record<string, unknown>,
   failSets: number
-): { get: typeof chrome.storage.local.get; set: typeof chrome.storage.local.set } {
+): {
+  get: typeof chrome.storage.local.get;
+  set: typeof chrome.storage.local.set;
+  remove: typeof chrome.storage.local.remove;
+} {
   let failuresLeft = failSets;
   const get = vi.fn(async (key: string) => {
     await Promise.resolve();
@@ -34,9 +38,14 @@ function makeArea(
     }
     Object.assign(store, items);
   });
+  const remove = vi.fn(async (key: string) => {
+    await Promise.resolve();
+    delete store[key];
+  });
   return {
     get: get as unknown as typeof chrome.storage.local.get,
     set: set as unknown as typeof chrome.storage.local.set,
+    remove: remove as unknown as typeof chrome.storage.local.remove,
   };
 }
 
@@ -54,6 +63,7 @@ export function useFakeStorage(options: { failLocalSets?: number } = {}): FakeSt
   chrome.storage.local.set = localArea.set;
   chrome.storage.session.get = sessionArea.get;
   chrome.storage.session.set = sessionArea.set;
+  chrome.storage.session.remove = sessionArea.remove;
   return {
     local,
     session,

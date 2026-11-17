@@ -38,6 +38,7 @@ const mockRuntime = {
 const mockStorageSession = {
   get: vi.fn().mockResolvedValue({}),
   set: vi.fn().mockResolvedValue(undefined),
+  remove: vi.fn().mockResolvedValue(undefined),
 };
 
 const mockStorageLocal = {
@@ -126,6 +127,7 @@ beforeEach(() => {
   mockAction.setTitle.mockResolvedValue(undefined);
   mockStorageSession.get.mockResolvedValue({});
   mockStorageSession.set.mockResolvedValue(undefined);
+  mockStorageSession.remove.mockResolvedValue(undefined);
   mockStorageLocal.get.mockResolvedValue({});
   mockStorageLocal.set.mockResolvedValue(undefined);
   mockContextMenus.create = makeCreateMock();

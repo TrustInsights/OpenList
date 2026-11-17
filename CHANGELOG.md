@@ -12,6 +12,15 @@ Nothing yet.
 
 - `lastError` and `recordError`: write-only (nothing read them), and a Chrome error text can hold a page address, against the promise that the totals never hold a URL (ruling 39). The totals keep three counters. Failed opens still count and show in the popup.
 
+### Fixed (Chisle review of 2026-11-17)
+
+- Two overlapping copy runs (shortcut and toolbar menu) no longer fail with "Receiving end does not exist": the runs write one at a time through the shared offscreen document.
+- The toolbar permission hint survives a service worker restart: the sticky message is kept in session storage, so a later short result gives the icon back to the hint.
+- A failed totals write no longer turns a good Open into an error: the failure is logged and the open result stands.
+- `ftp://` is no longer an address (Chrome 95 removed FTP): such a line is a search term and an `ftp:` tab is dropped.
+- The list box is read-only while Open or Copy runs, so the reply of Open cannot overwrite text typed meanwhile.
+- "Turn on clipboard detection" no longer leaves an unhandled rejection when the permission request fails: it shows "Could not turn on clipboard detection." and keeps the button.
+
 ### Fixed (owner bug report)
 
 - Chrome no longer lists a Content Security Policy error for `assets/zod-*.js` on the extension Errors page. Zod now runs with its JIT compiler off, and the policy stays strict. Tests: `tests/unit/schemas/zod.test.ts`, and an error guard in `tests/e2e/fixtures.ts` that fails every end-to-end test on a console error, a page error, or a worker error (it also caught the test site answering `/favicon.ico` with 404, now 204).

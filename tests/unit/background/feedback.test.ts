@@ -2,6 +2,7 @@
 
 import { clearFeedback, showResult } from '@/background/feedback';
 import { logger } from '@/utils/logger';
+import { useFakeStorage } from '@tests/helpers/chrome-storage';
 import { contrastRatio } from '@tests/helpers/contrast';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -10,6 +11,7 @@ const DEFAULT_TITLE = 'OpenList: open or copy a list of URLs';
 describe('showResult', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    useFakeStorage();
   });
 
   afterEach(async () => {
@@ -49,6 +51,40 @@ describe('showResult', () => {
     expect(chrome.action.setTitle).toHaveBeenLastCalledWith({ title: hint });
     expect(chrome.action.setBadgeText).toHaveBeenLastCalledWith({ text: '!' });
     expect(chrome.action.setBadgeText).not.toHaveBeenCalledWith({ text: '' });
+  });
+
+  it('keeps the sticky message when the service worker restarts before a short result ends', async () => {
+    const hint = 'Open OpenList and press "Turn on clipboard detection" once to turn on copying.';
+    await showResult(hint, false, true);
+    vi.resetModules();
+    const restarted = await import('@/background/feedback');
+
+    await restarted.showResult('Opened 1.', true);
+    await vi.advanceTimersByTimeAsync(3000);
+
+    expect(chrome.action.setTitle).toHaveBeenLastCalledWith({ title: hint });
+    expect(chrome.action.setBadgeText).toHaveBeenLastCalledWith({ text: '!' });
+    expect(chrome.action.setBadgeText).not.toHaveBeenCalledWith({ text: '' });
+  });
+
+  it('logs an error and does not reject when clearFeedback cannot forget the sticky message', async () => {
+    const error = vi.spyOn(logger, 'error').mockImplementation(() => undefined);
+    vi.mocked(chrome.storage.session.remove).mockRejectedValueOnce(new Error('session gone'));
+
+    await expect(clearFeedback()).resolves.toBeUndefined();
+
+    expect(error).toHaveBeenCalledWith('Feedback reset failed', { error: 'session gone' });
+    expect(chrome.action.setBadgeText).toHaveBeenCalledWith({ text: '' });
+  });
+
+  it('logs an error and rests when the sticky message cannot be read', async () => {
+    const error = vi.spyOn(logger, 'error').mockImplementation(() => undefined);
+    await showResult('Opened 1.', true);
+    vi.mocked(chrome.storage.session.get).mockRejectedValueOnce(new Error('session gone'));
+
+    await vi.advanceTimersByTimeAsync(3000);
+
+    expect(error).toHaveBeenCalledWith('Feedback restore failed', { error: 'session gone' });
   });
 
   it('rests after a short result once clearFeedback has forgotten the sticky message', async () => {

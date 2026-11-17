@@ -25,7 +25,11 @@ describe('toTabRecord', () => {
     }
   );
 
-  it.each(['chrome://settings/', 'chrome-extension://abc/popup/index.html', 'ftp://old.example/f'])(
+  it('returns null for an ftp tab, because Chrome 95 and later cannot load one', () => {
+    expect(toTabRecord(chromeTab({ url: 'ftp://old.example/f' }))).toBeNull();
+  });
+
+  it.each(['chrome://settings/', 'chrome-extension://abc/popup/index.html'])(
     'keeps the address %s',
     (url) => {
       expect(toTabRecord(chromeTab({ url }))?.url).toBe(url);

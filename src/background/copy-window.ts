@@ -48,12 +48,15 @@ async function closeOffscreenDocument(): Promise<void> {
   }
 }
 
+/** Tail of the write queue. All runs share one offscreen document, so each write waits for the one before it. */
+let writeTail: Promise<void> = Promise.resolve();
+
 /**
  * Sends the payload to the offscreen page and waits for its answer. The document closes after the write.
  * @param payload - The text and the optional HTML flavor
  * @returns A promise that resolves after the write and rejects with the failure text
  */
-async function writeThroughOffscreen(payload: ClipboardPayload): Promise<void> {
+async function writeOnce(payload: ClipboardPayload): Promise<void> {
   await ensureOffscreenDocument();
   try {
     const reply = OffscreenReplySchema.safeParse(
@@ -63,6 +66,26 @@ async function writeThroughOffscreen(payload: ClipboardPayload): Promise<void> {
     if (!reply.data.ok) throw new Error(reply.data.error);
   } finally {
     await closeOffscreenDocument();
+  }
+}
+
+/**
+ * Writes the payload through the offscreen page after every earlier write ends. A second run never
+ * closes the document that the first run still needs.
+ * @param payload - The text and the optional HTML flavor
+ * @returns A promise that resolves after the write and rejects with the failure text
+ */
+async function writeThroughOffscreen(payload: ClipboardPayload): Promise<void> {
+  const previous = writeTail;
+  let release!: () => void;
+  writeTail = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await previous;
+  try {
+    await writeOnce(payload);
+  } finally {
+    release();
   }
 }
 
