@@ -15,13 +15,12 @@ describe('openSelection', () => {
   let showSpy: MockInstance<typeof feedbackModule.showResult>;
 
   beforeEach(() => {
-    openListSpy = vi.spyOn(openListModule, 'openList').mockImplementation(async (list) => ({
-      successful: list.split('\n').length,
+    openListSpy = vi.spyOn(openListModule, 'openList').mockImplementation(async (urls) => ({
+      successful: urls.length,
       failed: 0,
-      skipped: 0,
       totalTime: 0,
       errors: [],
-      opened: list.split('\n'),
+      opened: [...urls],
     }));
     showSpy = vi.spyOn(feedbackModule, 'showResult').mockResolvedValue(undefined);
     openTabs([]);
@@ -35,21 +34,25 @@ describe('openSelection', () => {
     await openSelection(
       '- [Docs](https://docs.example.com/a)\n- [Blog](https://blog.example.org/b)'
     );
-    expect(openListSpy).toHaveBeenCalledWith(
-      'https://docs.example.com/a\nhttps://blog.example.org/b'
-    );
+    expect(openListSpy).toHaveBeenCalledWith([
+      'https://docs.example.com/a',
+      'https://blog.example.org/b',
+    ]);
     expect(showSpy).toHaveBeenCalledWith('Opened 2.', true);
   });
 
   it('keeps a search term and opens it as a search', async () => {
     await openSelection('https://a.example/\nbest pizza');
-    expect(openListSpy).toHaveBeenCalledWith('https://a.example/\nbest pizza');
+    expect(openListSpy).toHaveBeenCalledWith([
+      'https://a.example/',
+      'https://www.google.com/search?q=best%20pizza',
+    ]);
   });
 
   it('skips a page that is already open in the window, and says so', async () => {
     openTabs(['http://a.example/', 'https://c.example/']);
     await openSelection('https://a.example/\nhttps://b.example/');
-    expect(openListSpy).toHaveBeenCalledWith('https://b.example/');
+    expect(openListSpy).toHaveBeenCalledWith(['https://b.example/']);
     expect(showSpy).toHaveBeenCalledWith('Opened 1, skipped 1 already open.', true);
   });
 
@@ -66,13 +69,13 @@ describe('openSelection', () => {
       {} as chrome.tabs.Tab,
     ]);
     await openSelection('https://a.example/\nhttps://b.example/');
-    expect(openListSpy).toHaveBeenCalledWith('https://b.example/');
+    expect(openListSpy).toHaveBeenCalledWith(['https://b.example/']);
     expect(showSpy).toHaveBeenCalledWith('Opened 1, skipped 1 already open.', true);
   });
 
   it('removes a repeated address in the selection', async () => {
     await openSelection('https://a.example/\nhttps://a.example/');
-    expect(openListSpy).toHaveBeenCalledWith('https://a.example/');
+    expect(openListSpy).toHaveBeenCalledWith(['https://a.example/']);
   });
 
   it('says there is nothing to open for a selection of blank text', async () => {
@@ -84,7 +87,7 @@ describe('openSelection', () => {
   it('stops at the tab limit and reports the rest', async () => {
     const urls = Array.from({ length: 25 }, (_, i) => `https://x.example/${i}`);
     await openSelection(urls.join('\n'));
-    expect(openListSpy.mock.calls[0]?.[0].split('\n')).toHaveLength(20);
+    expect(openListSpy.mock.calls[0]?.[0]).toHaveLength(20);
     expect(showSpy).toHaveBeenCalledWith('Opened 20, 5 more over the limit of 20.', true);
   });
 
@@ -92,7 +95,6 @@ describe('openSelection', () => {
     openListSpy.mockResolvedValue({
       successful: 1,
       failed: 1,
-      skipped: 0,
       totalTime: 0,
       errors: ['x'],
       opened: [],

@@ -6,9 +6,9 @@ import type { Format } from '@/schemas/settings';
 import type { TabRecord } from '@/schemas/tab';
 import { writeClipboard } from '@/utils/clipboard';
 import { toErrorMessage } from '@/utils/errors';
-import { type Entry, parseList, urlKey } from '@/utils/extract-urls';
+import { parseList, urlKey } from '@/utils/extract-urls';
 import { formatExample, formatTabs } from '@/utils/formatters';
-import { allOpen, openLabel, planOpen, remainingText } from '@/utils/open-plan';
+import { allOpen, entryUrl, openLabel, planOpen, remainingText } from '@/utils/open-plan';
 import { resolveTabs } from '@/utils/tabs-source';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -50,15 +50,6 @@ interface ListActions {
  */
 function counted(count: number, noun: string): string {
   return `${count} ${noun}${count === 1 ? '' : 's'}`;
-}
-
-/**
- * Gives the line an entry sends to the service worker.
- * @param entry - A list entry.
- * @returns The URL, or the search term.
- */
-function lineOf(entry: Entry): string {
-  return entry.kind === 'url' ? entry.url : entry.term;
 }
 
 /**
@@ -131,7 +122,7 @@ export function useListActions({ text, setText, known, format }: ListActionsArgs
     setRunning(true);
     try {
       const raw = await chrome.runtime.sendMessage(
-        OpenListMessageSchema.parse({ action: 'openList', urls: plan.batch.map(lineOf).join('\n') })
+        OpenListMessageSchema.parse({ action: 'openList', urls: plan.batch.map(entryUrl) })
       );
       const reply = OpenListResponseSchema.safeParse(raw);
       if (!reply.success) {
@@ -143,8 +134,8 @@ export function useListActions({ text, setText, known, format }: ListActionsArgs
         setError(errors.join('\n') || 'Failed to open tabs');
       }
       if (opened.length === 0) return;
-      const openedLines = new Set(opened);
-      const openedEntries = plan.batch.filter((entry) => openedLines.has(lineOf(entry)));
+      const openedUrls = new Set(opened);
+      const openedEntries = plan.batch.filter((entry) => openedUrls.has(entryUrl(entry)));
       const next = remainingText(text, plan, openedEntries);
       setText(next);
       setResumeText(next);

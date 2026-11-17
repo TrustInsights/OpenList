@@ -149,7 +149,10 @@ describe('stored keys and exports', () => {
   it('a failed tab open in openList stores no URL and no search text in local storage', async () => {
     const fake = useFakeStorage();
     vi.spyOn(tabsModule, 'createTab').mockRejectedValue(new Error('tab creation error'));
-    const result = await openList('https://secret.example/path\nbest pizza');
+    const result = await openList([
+      'https://secret.example/path',
+      'https://www.google.com/search?q=best%20pizza',
+    ]);
     expect(result.failed).toBe(2);
     expect(result.errors.join(' ')).toContain('secret.example');
     expect(fake.local.totals).toEqual({
@@ -159,7 +162,7 @@ describe('stored keys and exports', () => {
     });
     const stored = JSON.stringify(fake.local);
     expect(stored).not.toContain('secret.example');
-    expect(stored).not.toContain('best pizza');
+    expect(stored).not.toContain('best%20pizza');
   });
 
   it('Totals never hold URLs: the stored object has exactly the three counter keys', async () => {

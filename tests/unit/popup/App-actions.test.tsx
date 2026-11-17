@@ -26,7 +26,6 @@ function reply(opened: string[]): unknown {
     results: {
       successful: opened.length,
       failed: 0,
-      skipped: 0,
       totalTime: 5,
       errors: [],
       opened,
@@ -114,7 +113,7 @@ describe('App open', () => {
     await user.click(screen.getByRole('button', { name: 'Open 2 URLs' }));
     expect(send).toHaveBeenCalledWith({
       action: 'openList',
-      urls: 'https://site2.com/\nhttps://site3.com/',
+      urls: ['https://site2.com/', 'https://site3.com/'],
     });
     await waitFor(() =>
       expect(screen.getByRole('status')).toHaveTextContent('Opened 2, skipped 1 already open.')

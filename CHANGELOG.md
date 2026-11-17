@@ -12,6 +12,10 @@ Nothing yet.
 
 - `lastError` and `recordError`: write-only (nothing read them), and a Chrome error text can hold a page address, against the promise that the totals never hold a URL (ruling 39). The totals keep three counters. Failed opens still count and show in the popup.
 
+### Changed (Chisle review, owner decision 24)
+
+- One parse for Open: `openList` takes an array of final URLs, the message carries `urls: string[]`, and the new `entryUrl` builds the address of a search entry. The second parse of the same text, the one-member `IncomingMessageSchema`, and the `skipped` reply field are gone (ruling 40).
+
 ### Changed (owner decision 23, 2026-11-17)
 
 - When every URL in the list is already open, the Open button reads "All open" and is disabled. It used to read "Open 0 URLs" on the default list. Copy stays live, and Ctrl or Cmd+Enter still reports "All N URLs are already open." (ruling 38).

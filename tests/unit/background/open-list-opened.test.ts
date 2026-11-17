@@ -17,35 +17,35 @@ describe('openList opened', () => {
     vi.restoreAllMocks();
   });
 
-  it('returns the input lines that opened a tab in opened', async () => {
-    const promise = openList('https://a.com\nhttps://b.com');
+  it('returns the URLs that opened a tab in opened', async () => {
+    const promise = openList(['https://a.com', 'https://b.com']);
     await vi.runAllTimersAsync();
     const result = await promise;
 
     expect(result.opened).toEqual(['https://a.com', 'https://b.com']);
   });
 
-  it('opened leaves out blank, invalid, and failed lines and keeps search text', async () => {
+  it('opened leaves out the URLs that failed', async () => {
     (tabsModule.createTab as ReturnType<typeof vi.fn>)
       .mockResolvedValueOnce({ id: 1 } as chrome.tabs.Tab)
       .mockRejectedValueOnce(new Error('tab creation error'))
       .mockResolvedValueOnce({ id: 3 } as chrome.tabs.Tab);
 
-    const promise = openList('  https://a.com  \n\nhttps://\nhttps://b.com\nbest pizza');
+    const promise = openList(['https://a.com', 'https://bad.com', 'https://b.com']);
     await vi.runAllTimersAsync();
     const result = await promise;
 
-    expect(result.opened).toEqual(['https://a.com', 'best pizza']);
+    expect(result.opened).toEqual(['https://a.com', 'https://b.com']);
     expect(result.successful).toBe(2);
-    expect(result.failed).toBe(2);
+    expect(result.failed).toBe(1);
   });
 
   it('opened stops at the tab cap', async () => {
-    const lines = Array.from({ length: 25 }, (_, i) => `https://example${i}.com`);
-    const promise = openList(lines.join('\n'));
+    const urls = Array.from({ length: 25 }, (_, i) => `https://example${i}.com`);
+    const promise = openList(urls);
     await vi.runAllTimersAsync();
     const result = await promise;
 
-    expect(result.opened).toEqual(lines.slice(0, 20));
+    expect(result.opened).toEqual(urls.slice(0, 20));
   });
 });

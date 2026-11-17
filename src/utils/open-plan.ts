@@ -22,6 +22,17 @@ function entryKey(entry: Entry): string {
 }
 
 /**
+ * Gives the address a tab opens for an entry.
+ * @param entry - A list entry.
+ * @returns The URL of a url entry, or a Google search address for a search entry.
+ */
+export function entryUrl(entry: Entry): string {
+  return entry.kind === 'url'
+    ? entry.url
+    : `https://www.google.com/search?q=${encodeURIComponent(entry.term)}`;
+}
+
+/**
  * Plans one Open click. URLs already open are skipped. The first `cap` of the rest open now.
  * A search entry is never "open".
  * @param text - The list text.

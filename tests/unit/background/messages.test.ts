@@ -31,6 +31,26 @@ describe('handleMessage', () => {
     expect(sendResponse).toHaveBeenCalledWith({ status: 'error', message: 'Unknown action' });
   });
 
+  it('openList message with urls as a string → rejected', () => {
+    const sendResponse = vi.fn();
+    const result = handleMessage(
+      { action: 'openList', urls: 'https://example.com' },
+      fakeSender,
+      sendResponse
+    );
+
+    expect(result).toBe(false);
+    expect(sendResponse).toHaveBeenCalledWith({ status: 'error', message: 'Unknown action' });
+  });
+
+  it('openList message with an empty array → rejected', () => {
+    const sendResponse = vi.fn();
+    const result = handleMessage({ action: 'openList', urls: [] }, fakeSender, sendResponse);
+
+    expect(result).toBe(false);
+    expect(sendResponse).toHaveBeenCalledWith({ status: 'error', message: 'Unknown action' });
+  });
+
   it('null payload → sendResponse({ status: "error" }), returns false', () => {
     const sendResponse = vi.fn();
     const result = handleMessage(null, fakeSender, sendResponse);
@@ -44,7 +64,6 @@ describe('handleMessage', () => {
       const fakeResults = {
         successful: 2,
         failed: 0,
-        skipped: 0,
         totalTime: 50,
         errors: [],
         opened: ['https://example.com', 'https://test.com'],
@@ -53,12 +72,13 @@ describe('handleMessage', () => {
       const sendResponse = vi.fn();
 
       const result = handleMessage(
-        { action: 'openList', urls: 'https://example.com\nhttps://test.com' },
+        { action: 'openList', urls: ['https://example.com', 'https://test.com'] },
         fakeSender,
         sendResponse
       );
 
       expect(result).toBe(true);
+      expect(openListSpy).toHaveBeenCalledWith(['https://example.com', 'https://test.com']);
 
       // Wait for the async handler to resolve
       await vi.waitFor(() => expect(sendResponse).toHaveBeenCalled());
@@ -77,7 +97,7 @@ describe('handleMessage', () => {
       const sendResponse = vi.fn();
 
       const result = handleMessage(
-        { action: 'openList', urls: 'https://example.com' },
+        { action: 'openList', urls: ['https://example.com'] },
         fakeSender,
         sendResponse
       );

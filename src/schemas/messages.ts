@@ -5,11 +5,8 @@ import { z } from 'zod';
 /** Message that asks the background worker to open a list of URLs or search terms. */
 export const OpenListMessageSchema = z.object({
   action: z.literal('openList'),
-  urls: z.string().min(1),
+  urls: z.array(z.string()).min(1),
 });
-
-/** Any message the background worker accepts, keyed on its action. */
-export const IncomingMessageSchema = z.discriminatedUnion('action', [OpenListMessageSchema]);
 
 /** The text and the optional HTML flavor that the offscreen page puts on the clipboard. */
 const ClipboardPayloadSchema = z.object({
@@ -36,10 +33,9 @@ export const OpenListResponseSchema = z.object({
   results: z.object({
     successful: z.number().int().min(0),
     failed: z.number().int().min(0),
-    skipped: z.number().int().min(0),
     totalTime: z.number().min(0),
     errors: z.array(z.string()),
-    /** The input lines that opened a tab. */
+    /** The URLs that opened a tab. */
     opened: z.array(z.string()),
   }),
 });

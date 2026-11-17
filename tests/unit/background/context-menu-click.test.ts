@@ -21,7 +21,6 @@ describe('handleContextMenuClick', () => {
     openListSpy = vi.spyOn(openListModule, 'openList').mockResolvedValue({
       successful: 1,
       failed: 0,
-      skipped: 0,
       totalTime: 0,
       errors: [],
       opened: [],
@@ -32,10 +31,10 @@ describe('handleContextMenuClick', () => {
     vi.restoreAllMocks();
   });
 
-  it('opens the selection and records no error on success', async () => {
+  it('opens the selection', async () => {
     await handleContextMenuClick(CLICK);
 
-    expect(openListSpy).toHaveBeenCalledWith('https://example.com/');
+    expect(openListSpy).toHaveBeenCalledWith(['https://example.com/']);
   });
 
   it("copies this window's tabs on a click on the toolbar item, with no selection", async () => {

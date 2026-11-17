@@ -12,7 +12,6 @@ function reply(opened: string[], errors: string[] = []): unknown {
     results: {
       successful: opened.length,
       failed: errors.length,
-      skipped: 0,
       totalTime: 5,
       errors,
       opened,
@@ -28,7 +27,7 @@ describe('useListActions open', () => {
     const actions = await renderActions(SIX.join('\n'), { open: SIX.slice(0, 2) });
     send.mockResolvedValue(reply(SIX.slice(2)));
     await act(async () => actions.current.open());
-    expect(send).toHaveBeenCalledWith({ action: 'openList', urls: SIX.slice(2).join('\n') });
+    expect(send).toHaveBeenCalledWith({ action: 'openList', urls: SIX.slice(2) });
     expect(actions.current.text).toBe('');
     expect(actions.current.status).toBe('Opened 4, skipped 2 already open.');
     expect(actions.current.error).toBeNull();
@@ -107,11 +106,16 @@ describe('useListActions open', () => {
     expect(actions.current.running).toBe(false);
   });
 
-  it('open() sends search terms as lines and removes them when they open', async () => {
+  it('open() sends search terms as search addresses and removes them when they open', async () => {
     const actions = await renderActions('best pizza\nhttps://a.com');
-    send.mockResolvedValue(reply(['best pizza', 'https://a.com/']));
+    send.mockResolvedValue(
+      reply(['https://www.google.com/search?q=best%20pizza', 'https://a.com/'])
+    );
     await act(async () => actions.current.open());
-    expect(send).toHaveBeenCalledWith({ action: 'openList', urls: 'best pizza\nhttps://a.com/' });
+    expect(send).toHaveBeenCalledWith({
+      action: 'openList',
+      urls: ['https://www.google.com/search?q=best%20pizza', 'https://a.com/'],
+    });
     expect(actions.current.text).toBe('');
   });
 

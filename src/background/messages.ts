@@ -1,7 +1,7 @@
 // Runtime message validation and dispatch for the service worker
 
 import { openList } from '@/background/open-list';
-import { IncomingMessageSchema } from '@/schemas/messages';
+import { OpenListMessageSchema } from '@/schemas/messages';
 import { toErrorMessage } from '@/utils/errors';
 import { logger } from '@/utils/logger';
 
@@ -19,7 +19,7 @@ export function handleMessage(
   _sender: chrome.runtime.MessageSender,
   sendResponse: SendResponse
 ): boolean {
-  const parsed = IncomingMessageSchema.safeParse(request);
+  const parsed = OpenListMessageSchema.safeParse(request);
 
   if (!parsed.success) {
     logger.warn('Unknown or invalid message', { error: parsed.error.message });

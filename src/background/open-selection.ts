@@ -4,7 +4,7 @@ import { showResult } from '@/background/feedback';
 import { openList } from '@/background/open-list';
 import { CONFIG } from '@/schemas/config';
 import { urlKey } from '@/utils/extract-urls';
-import { type OpenPlan, planOpen } from '@/utils/open-plan';
+import { type OpenPlan, entryUrl, planOpen } from '@/utils/open-plan';
 
 /**
  * Writes the result message of the right-click path.
@@ -49,7 +49,6 @@ export async function openSelection(text: string, windowId?: number): Promise<vo
     );
     return;
   }
-  const lines = plan.batch.map((entry) => (entry.kind === 'url' ? entry.url : entry.term));
-  const result = await openList(lines.join('\n'));
+  const result = await openList(plan.batch.map(entryUrl));
   await showResult(summary(plan, result.successful, result.failed), result.failed === 0);
 }

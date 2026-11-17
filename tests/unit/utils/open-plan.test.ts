@@ -1,7 +1,14 @@
 // Unit tests for utils/open-plan.ts: the open plan, the button label, and the remaining text
 
 import { urlKey } from '@/utils/extract-urls';
-import { type OpenPlan, allOpen, openLabel, planOpen, remainingText } from '@/utils/open-plan';
+import {
+  type OpenPlan,
+  allOpen,
+  entryUrl,
+  openLabel,
+  planOpen,
+  remainingText,
+} from '@/utils/open-plan';
 import { describe, expect, it } from 'vitest';
 
 const CAP = 20;
@@ -10,6 +17,20 @@ const CAP = 20;
 function manyUrls(count: number): string {
   return Array.from({ length: count }, (_, i) => `https://site${i}.com/page`).join('\n');
 }
+
+describe('entryUrl', () => {
+  it('gives the url of a url entry', () => {
+    expect(entryUrl({ kind: 'url', url: 'https://a.com/x?y=1', line: 0 })).toBe(
+      'https://a.com/x?y=1'
+    );
+  });
+
+  it('builds a Google search address for a search entry, with spaces and symbols encoded', () => {
+    expect(entryUrl({ kind: 'search', term: 'best pizza & pasta?', line: 0 })).toBe(
+      'https://www.google.com/search?q=best%20pizza%20%26%20pasta%3F'
+    );
+  });
+});
 
 describe('planOpen', () => {
   it('fills the batch up to the cap and leaves the rest waiting', () => {
