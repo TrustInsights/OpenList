@@ -7,5 +7,8 @@
     "src/**/*.{ts,tsx}!",
     "tests/**/*.{ts,tsx}",
     "*.config.ts"
+  ],
+  "ignoreBinaries": [
+    "magick"
   ]
 }

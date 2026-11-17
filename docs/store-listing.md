@@ -13,8 +13,8 @@ The store summary comes from the manifest description ("Summary from package"). 
 | Description (max 16,000) | 200 characters, credits Chris Dzombak | The text below (4413 characters). It follows the layout of the Figured listing: story line, overview, key features, how it works, permissions, open source. |
 | Category | Functionality & UI | No change |
 | Language | English (United States) | No change |
-| Screenshots | Make new ones (the old ones show the old popup) | At least one 1280x800 PNG without alpha |
-| Small promo tile | 440x280 | New image |
+| Screenshots | The old ones show the old popup | Three 1280x800 PNGs from `pnpm store-images`: `screenshot-1-open-list.png`, `screenshot-2-copy-tabs.png`, `screenshot-3-details.png` (in `output/store-images/`) |
+| Small promo tile | 440x280 | `promo-tile-440x280.png` from `pnpm store-images` |
 | Homepage URL | https://www.trustinsights.ai?utm_source=openlist&utm_medium=referral&utm_campaign=openlist_1_0 | Change the campaign tag to openlist_1_2_0 so it matches the footer link |
 | Support URL | Same as the homepage | https://github.com/TrustInsights/OpenList/issues (decision for the owner) |
 

@@ -11,6 +11,7 @@ credentials.json
 .superpowers/
 temp/
 output/artifacts/
+output/store-images/
 output/coverage/
 output/playwright-report/
 graphify-out/cache/

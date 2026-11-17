@@ -18,7 +18,8 @@
     "audit": "pnpm audit --audit-level=high",
     "size": "pnpm build && size-limit",
     "index:qmd": "sh src/tools/qmd-index.sh",
-    "package": "pnpm build && sh src/tools/package-release.sh"
+    "package": "pnpm build && sh src/tools/package-release.sh",
+    "store-images": "pnpm build && playwright test tests/e2e/store-images.spec.ts"
   },
   "dependencies": {
     "react": "^19.0.0",

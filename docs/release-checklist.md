@@ -9,7 +9,7 @@ Items marked OWNER need you. An agent cannot do them.
 - [ ] Decide the open items in output/review/2026-11-16-status-and-open-items.md (round trip for Title & URL and Link, toolbar title time, clipboard site-like lines, right-click path). OWNER
 - [ ] Manual accessibility pass in docs/accessibility.md (VoiceOver, real zoom, real forced colors, the real permission prompt). OWNER
 - [ ] Approve the manifest description and the listing text in docs/store-listing.md. OWNER
-- [ ] Make new store images (the current ones show the old popup): at least one 1280x800 screenshot, and the 440x280 small tile.
+- [x] New store images exist. `pnpm store-images` builds three 1280x800 screenshots and the 440x280 small tile from the real extension into `output/store-images/` (RGB PNG, no alpha; the test checks size and color type). Review them and upload them. OWNER
 - [ ] Host the privacy policy at a public address. GitHub address after the merge: https://github.com/TrustInsights/OpenList/blob/master/docs/privacy-policy.md
 
 ## Build the package
