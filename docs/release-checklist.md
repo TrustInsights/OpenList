@@ -4,7 +4,7 @@ Items marked OWNER need you. An agent cannot do them.
 
 ## Before the upload
 
-- [ ] Merge the branch `feat/single-list-popup-copy-wcag` into `master` (pull request: https://github.com/TrustInsights/OpenList/pull/new/feat/single-list-popup-copy-wcag). OWNER
+- [x] Merged into `master` on 2026-11-17 (fast-forward, commit 4f67803). The branch `feat/single-list-popup-copy-wcag` still exists on GitHub.
 - [ ] Run `pnpm check` and `pnpm exec playwright test`. Both pass.
 - [ ] Decide the open items in output/review/2026-11-16-status-and-open-items.md (round trip for Title & URL and Link, toolbar title time, clipboard site-like lines, right-click path). OWNER
 - [ ] Manual accessibility pass in docs/accessibility.md (VoiceOver, real zoom, real forced colors, the real permission prompt). OWNER
